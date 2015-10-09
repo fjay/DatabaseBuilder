@@ -1,0 +1,7 @@
+records:
+  - table : test2
+    loadMethod : CLEAR_AND_INSERT
+    data : |
+      name|age|amount|created_time
+      a   |1  |1     |2015-10-01
+      b   |2  |10.2  |

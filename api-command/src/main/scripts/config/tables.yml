@@ -1,0 +1,28 @@
+tables:
+- name : test
+  comment : 测试表
+  columns : |
+    NAME        |TYPE    |LENGTH|NULLABLE|COMMENT
+    name        |VARCHAR |32    |0       |名称
+    age         |INT     |5     |0       |年龄
+    amount      |FLOAT   |10,2  |1       |金额
+    created_time|DATETIME|      |1       |创建时间
+  indexes:
+  - type : PK
+    columns :
+    - name
+
+  - type : INDEX
+    name : IDX_AGE
+    columns :
+    - age
+    - created_time
+
+- name : test2
+  comment : 测试表2
+  columns : |
+    NAME        |TYPE    |LENGTH|COMMENT
+    name        |VARCHAR |32    |名称
+    age         |INT     |5     |年龄
+    amount      |FLOAT   |10,2  |金额
+    created_time|DATETIME|      |创建时间
