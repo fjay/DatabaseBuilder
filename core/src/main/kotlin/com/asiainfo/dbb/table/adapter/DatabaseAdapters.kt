@@ -1,22 +1,12 @@
 package com.asiainfo.dbb.table.adapter
 
+import com.asiainfo.dbb.util.Registrator
 import org.nutz.dao.DB
-import java.util.*
 
-object DatabaseAdapters {
-
-    private val adapters = HashMap<DB, DatabaseAdapter>()
+object DatabaseAdapters : Registrator<DB, DatabaseAdapter> () {
 
     init {
         register(MysqlAdapter)
         register(HsqldbAdapter)
-    }
-
-    fun register(adapter: DatabaseAdapter) {
-        adapters[adapter.getDB()] = adapter
-    }
-
-    operator fun get(type: DB): DatabaseAdapter? {
-        return adapters[type]
     }
 }

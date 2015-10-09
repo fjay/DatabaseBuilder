@@ -4,8 +4,8 @@ import com.asiainfo.dbb.model.Column
 import com.asiainfo.dbb.model.Index
 import com.asiainfo.dbb.model.Table
 import com.asiainfo.dbb.table.adapter.DatabaseAdapters
+import com.asiainfo.dbb.util.DaoUtil
 import org.nutz.dao.Dao
-import org.nutz.dao.util.Daos
 import org.nutz.lang.Lang
 import java.sql.Connection
 import java.sql.DatabaseMetaData
@@ -19,95 +19,74 @@ class TableMetaDataLoader(val dao: Dao) {
     fun load(tableNamePattern: String = "%"): List<Table> {
         val tables = ArrayList<Table>()
         dao.run { conn: Connection ->
-            var rs: ResultSet? = null
-            try {
-                rs = conn.metaData.getTables(null, "%", tableNamePattern, arrayOf("TABLE"))
-                while (rs.next()) {
-                    val record = org.nutz.dao.entity.Record.create(rs)
+            val rs = conn.metaData.getTables(null, "%", tableNamePattern, arrayOf("TABLE"))
+            DaoUtil.each(rs) { record ->
+                val tableName = record.getString("table_name")
+                val pk = parsePrimaryKey(conn.metaData, tableName)
+                val columns = parseColumns(conn.metaData, tableName, pk)
+                val indexes = parseIndexes(conn.metaData, tableName)
 
-                    val tableName = record.getString("table_name")
-                    val columns = parseColumns(conn.metaData, tableName)
-                    val pk = parsePrimaryKey(conn.metaData, tableName)
-                    val indexes = parseIndexes(conn.metaData, tableName)
-
-                    tables.add(Table(
-                            name = tableName.toLowerCase(),
-                            columns = columns,
-                            primaryKey = pk,
-                            indexes = indexes.filter { it.name != pk?.name },
-                            comment = record.getString("remarks")))
-                }
-            } finally {
-                Daos.safeClose(rs)
+                tables.add(Table(
+                        name = tableName.toLowerCase(),
+                        columns = columns,
+                        primaryKey = pk,
+                        indexes = indexes.filter { it.name != pk?.name },
+                        comment = record.getString("remarks")))
             }
         }
 
         return tables
     }
 
-    private fun parseColumns(metaData: DatabaseMetaData, tableName: String): List<Column> {
-        var rs: ResultSet? = null
+    private fun parseColumns(metaData: DatabaseMetaData, tableName: String, pk: Index?): List<Column> {
         val columns = ArrayList<Column>()
+        val rs = metaData.getColumns(null, "%", tableName, "%")
 
-        try {
-            rs = metaData.getColumns(null, "%", tableName, "%")
-            while (rs.next()) {
-                columns.add(parseColumn(org.nutz.dao.entity.Record.create(rs)))
-            }
-
-            return columns
-        } finally {
-            Daos.safeClose(rs)
+        DaoUtil.each(rs) {
+            columns.add(parseColumn(it, pk))
         }
+
+        return columns
     }
 
-    private fun parseColumn(record: org.nutz.dao.entity.Record): Column {
+    private fun parseColumn(record: org.nutz.dao.entity.Record, pk: Index?): Column {
         val type = adapter.asColType(record) ?:
                 throw RuntimeException("Unknown column type:" + adapter.getTypeName(record))
 
+        val name = record.getString("column_name").toLowerCase()
         return Column(
-                name = record.getString("column_name").toLowerCase(),
+                name = name,
                 type = type,
                 width = record.getInt("column_size"),
                 precision = record.getInt("decimal_digits"),
                 javaType = TableDocumentParser.asJavaType(type),
-                pk = false,
+                pk = pk?.name == name,
                 nullable = Lang.parseBoolean(record.getString("nullable")),
                 comment = record.getString("remarks")
         )
     }
 
     private fun parsePrimaryKey(metaData: DatabaseMetaData, tableName: String): Index? {
-        var rs: ResultSet? = null
-        try {
-            rs = metaData.getPrimaryKeys(null, null, tableName)
-            val indexes = parseIndexes(rs, true)
+        val rs = metaData.getPrimaryKeys(null, null, tableName)
+        val indexes = parseIndexes(rs, true)
 
-            if (indexes.isEmpty()) {
-                return null
-            } else {
-                return indexes.first()
-            }
-        } finally {
-            Daos.safeClose(rs)
+        if (indexes.isEmpty()) {
+            return null
+        } else {
+            return indexes.first()
         }
     }
 
     private fun parseIndexes(metaData: DatabaseMetaData, tableName: String): List<Index> {
-        var rs: ResultSet? = null
-        try {
-            rs = metaData.getIndexInfo(null, null, tableName, false, false)
-            return parseIndexes(rs, false)
-        } finally {
-            Daos.safeClose(rs)
-        }
+        val rs = metaData.getIndexInfo(null, null, tableName, false, false)
+        return parseIndexes(rs, false)
     }
 
-    private fun parseIndexes(rs: ResultSet, isPk: Boolean): List<Index> {
+    private fun parseIndexes(rs: ResultSet?, isPk: Boolean): List<Index> {
         val indexes = ArrayList<Index>()
         val indexMap = HashMap<String, MutableList<String>>()
-        while (rs.next()) {
-            val record = org.nutz.dao.entity.Record.create(rs)
+
+        DaoUtil.each(rs) { record ->
             val name = if (isPk) record.getString("pk_name") else record.getString("index_name")
             val unique: Boolean = !Lang.parseBoolean(record.getString("non_unique"))
 

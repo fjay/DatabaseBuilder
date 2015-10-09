@@ -19,7 +19,7 @@ class TableClassBuilder(val tables: List<Table>) {
     private val defaultTemplate = Files.read("TableClassTemplate.txt")
 
     init {
-        rythm.registerTransformer(TableClassTransformer::class.java)
+        rythm.registerTransformer(TableClassTemplateTransformer::class.java)
     }
 
     fun buildClassesInMemory(tableClassPackage: String): List<Class<*>> {

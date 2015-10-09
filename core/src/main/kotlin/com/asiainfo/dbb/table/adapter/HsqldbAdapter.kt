@@ -6,7 +6,7 @@ import org.nutz.dao.entity.annotation.ColType
 
 object HsqldbAdapter : AbstractDatabaseAdapter() {
 
-    override fun getDB(): DB {
+    override fun getKey(): DB {
         return DB.HSQL
     }
 

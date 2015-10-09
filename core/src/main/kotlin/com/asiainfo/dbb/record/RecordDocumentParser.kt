@@ -2,7 +2,8 @@ package com.asiainfo.dbb.record
 
 import com.asiainfo.dbb.model.Record
 import com.asiainfo.dbb.model.Table
-import com.asiainfo.dbb.util.TableFormatter
+import com.asiainfo.dbb.record.transformer.DataTransformers
+import com.asiainfo.dbb.util.DataTableUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.nutz.castor.Castors
@@ -35,7 +36,7 @@ object RecordDocumentParser {
 
     private fun parseData(table: Table, text: String): List<Record.Data> {
         val result = ArrayList<Record.Data>()
-        TableFormatter.each(text) { map ->
+        DataTableUtil.each(text) { map ->
             val columnData = ArrayList<Record.ColumnData>()
             map.forEach {
                 val columnName = it.key
@@ -43,7 +44,7 @@ object RecordDocumentParser {
                     it.name == columnName
                 } ?: throw  IllegalArgumentException("Invalid column")
 
-                val value = it.value.cast(column.javaType)
+                val value = it.value.castTo(column.javaType)
                 columnData.add(Record.ColumnData(column, value))
             }
 
@@ -53,12 +54,15 @@ object RecordDocumentParser {
         return result
     }
 
-    private fun <T : Any> String?.cast(toClass: Class<T>): T? {
+    private fun <T : Any> String?.castTo(toClass: Class<T>): T? {
         if (Strings.isBlank(this)) {
             return null
         }
 
-        return Castors.create().cast(this!!.trim(), String::class.java, toClass)
+        val dt = DataTransformers[this!!]
+        val value = (if (dt != null) dt.execute() else this) ?: return null
+
+        return Castors.create().castTo(value.trim(), toClass)
     }
 
     private class RecordDocument {

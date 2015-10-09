@@ -4,7 +4,7 @@ import org.nutz.lang.Strings
 import org.rythmengine.extension.Transformer
 
 @Transformer
-object TableClassTransformer {
+object TableClassTemplateTransformer {
     @JvmStatic fun upperWord(cs: String): String {
         return Strings.upperWord(cs, '_')
     }

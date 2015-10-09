@@ -3,7 +3,7 @@ package com.asiainfo.dbb.util
 import org.nutz.lang.Strings
 import java.util.*
 
-object TableFormatter {
+object DataTableUtil {
 
     inline fun each(text: String, ele: (Map<String, String>) -> Unit) {
         val result = ArrayList<Map<String, String>>()
@@ -33,10 +33,10 @@ object TableFormatter {
     }
 
     fun <T : MutableMap<String, *>> format(data: List<T>?): String? {
-        return DataTableUtil.format(data)
+        return Formatter.format(data)
     }
 
-    private object DataTableUtil {
+    private object Formatter {
 
         private val SUFFIX_MAX_LENGTH = "MaxLength"
 
