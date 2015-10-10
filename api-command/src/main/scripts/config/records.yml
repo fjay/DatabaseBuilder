@@ -2,9 +2,9 @@ records:
   - table : TEST
     loadMethod : CLEAR_AND_INSERT
     data : |
-      NAME  |AGE|AMOUNT|CREATED_TIME
-      uuid()|1  |1     |2015-10-01
-      uuid()|2  |10.2  |
+      NAME          |AGE|AMOUNT|CREATED_TIME
+      Strings.uuid()|1  |1     |Dates.now()
+      Strings.uuid()|2  |10.2  |Dates.now("yyyy-MM-dd")
   - table : TEST2
     loadMethod : CLEAR_AND_INSERT
     data : |
