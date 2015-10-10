@@ -27,7 +27,7 @@ class TableMetaDataLoader(val dao: Dao) {
                 val indexes = parseIndexes(conn.metaData, tableName)
 
                 tables.add(Table(
-                        name = tableName.toLowerCase(),
+                        name = tableName,
                         columns = columns,
                         primaryKey = pk,
                         indexes = indexes.filter { it.name != pk?.name },
@@ -53,7 +53,7 @@ class TableMetaDataLoader(val dao: Dao) {
         val type = adapter.asColType(record) ?:
                 throw RuntimeException("Unknown column type:" + adapter.getTypeName(record))
 
-        val name = record.getString("column_name").toLowerCase()
+        val name = record.getString("column_name")
         return Column(
                 name = name,
                 type = type,
@@ -98,7 +98,7 @@ class TableMetaDataLoader(val dao: Dao) {
                 indexes.add(Index(parseIndexType(unique, isPk), name, columns))
             }
 
-            columns.add(record.getString("column_name").toLowerCase())
+            columns.add(record.getString("column_name"))
         }
 
         return indexes

@@ -34,14 +34,14 @@ import org.nutz.dao.entity.annotation.*;
 }
 
 @def renderMethodName(String columnName){
-@columnName.app_upperWord().app_upperFirst()
+@columnName.toLowerCase().app_upperWord().app_upperFirst()
 }
 
 @@Table("@table.getName()")
 @@Comment("@table.getComment()")
 @renderPKAnnotation()
 @renderIndexesAnnotation()
-public class @table.getName().app_upperWord().app_upperFirst() {
+public class @table.getName().toLowerCase().app_upperWord().app_upperFirst() {
 
 @for(com.asiainfo.dbb.model.Column column : table.getColumns()) {
     @{String columnName = column.getName()}
@@ -57,7 +57,7 @@ public class @table.getName().app_upperWord().app_upperFirst() {
         ,notNull = @if(column.getNullable()) {false} else {true}
     )
     @@Comment("@column.getComment()")
-    private @column.getJavaType().getSimpleName() @columnName.app_upperWord();
+    private @column.getJavaType().getSimpleName() @columnName.toLowerCase().app_upperWord();
 
 }
 
@@ -67,10 +67,10 @@ public class @table.getName().app_upperWord().app_upperFirst() {
         @{columnName = "id"}
     }
     public @column.getJavaType().getSimpleName() get@renderMethodName(columnName) () {
-        return @columnName.app_upperWord();
+        return @columnName.toLowerCase().app_upperWord();
     }
     public void set@renderMethodName(columnName) (@column.getJavaType().getSimpleName() obj) {
-        @columnName.app_upperWord() = obj;
+        @columnName.toLowerCase().app_upperWord() = obj;
     }
 
 }

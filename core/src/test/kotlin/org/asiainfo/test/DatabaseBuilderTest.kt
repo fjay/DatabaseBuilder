@@ -14,6 +14,7 @@ class DatabaseBuilderTest : IocTest() {
         val b = databaseBuilder()
         b.createTablesWithFilePath("tables.yml", "org.asiainfo.test.entity")
         println(b.toTableDocument())
+        b.fillDataWithFilePath("records.yml")
     }
 
     @Test

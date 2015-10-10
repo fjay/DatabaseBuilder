@@ -51,7 +51,7 @@ class TableClassBuilder(val tables: List<Table>) {
     }
 
     private fun getClassName(tableName: String): String {
-        return Strings.upperFirst(Strings.upperWord(tableName, '_'))
+        return Strings.upperFirst(Strings.upperWord(tableName.toLowerCase(), '_'))
     }
 
     private fun buildClassInMemory(tableClassPackage: String, table: Table): Class<*>? {
