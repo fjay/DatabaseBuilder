@@ -79,6 +79,15 @@ mvn clean package -Dmaven.test.skip=true
 cd target/database-builder-command-*-bin/database-builder-command-*
 ```
 
+#### 项目结构
+```
+config
+lib
+database-builder-command-*.jar
+dbb.bat
+dbb.sh
+```
+
 #### 配置文件
 
 config/config.properties
@@ -103,6 +112,10 @@ jdbc.url=jdbc:hsqldb:mem:db
 jdbc.username=sa
 jdbc.password=sa
 ```
+#### JDBC依赖包
+
+ 应用默认只带了hsqldb的jdbc依赖包,若需要支持其他数据库,请将对应的jdbc依赖包复制到lib文件夹下即可
+
 #### 使用方法
 
 Window平台:
