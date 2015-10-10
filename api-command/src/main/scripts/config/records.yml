@@ -1,5 +1,5 @@
 records:
-  - table : test2
+  - table : TEST2
     loadMethod : CLEAR_AND_INSERT
     data : |
       NAME|AGE|AMOUNT|CREATED_TIME
