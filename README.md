@@ -27,7 +27,7 @@ DatabaseBuilder以一套统一的、简单的文本结构，构建主流数据�
   * MySql
 
 * 表数据文本格式支持动态表达式,支持自定义表达式
-* 反向生成 DatabaseBuilder 文本结构
+* 反向生成 DatabaseBuilder 文本结构,支持数据库:
   * HSQL
   * MySql
 
@@ -105,13 +105,13 @@ jdbc.password=sa
 ```
 #### 使用方法
 
-Window平台
+Window平台:
 
 ```
 dbb.bat -h
 ```
 
-Linux平台运行
+Linux平台:
 
 ```
 ./dbb.sh -h
@@ -126,4 +126,53 @@ usage: dbb [-ct] [-ctc] [-ctd] [-fd] [-h]
  -ctd,--create-table-document   反向生成DatabaseBuilder文本结构
  -fd,--fill-data                生成指定表的数据记录
  -h,--help                      帮助说明
+```
+
+### 文本结构
+#### 表
+```
+tables:
+- name : TEST
+  comment : 测试表
+  columns : |
+    NAME        |TYPE    |LENGTH|NULLABLE|COMMENT
+    NAME        |VARCHAR |32    |0       |名称
+    AGE         |INT     |5     |0       |年龄
+    AMOUNT      |FLOAT   |10,2  |1       |金额
+    CREATED_TIME|DATETIME|      |1       |创建时间
+  indexes:
+  - type : PK
+    columns :
+    - NAME
+
+  - type : INDEX
+    name : IDX_AGE
+    columns :
+    - AGE
+    - CREATED_TIME
+
+- name : TEST2
+  comment : 测试表2
+  columns : |
+    NAME        |TYPE    |LENGTH|COMMENT
+    NAME        |VARCHAR |32    |名称
+    AGE         |INT     |5     |年龄
+    AMOUNT      |FLOAT   |10,2  |金额
+    CREATED_TIME|DATETIME|      |创建时间
+```
+#### 数据
+```
+records:
+  - table : TEST
+    loadMethod : CLEAR_AND_INSERT
+    data : |
+      NAME          |AGE|AMOUNT|CREATED_TIME
+      Strings.uuid()|1  |1     |Dates.now()
+      Strings.uuid()|2  |10.2  |Dates.now("yyyy-MM-dd")
+  - table : TEST2
+    loadMethod : CLEAR_AND_INSERT
+    data : |
+      NAME|AGE|AMOUNT|CREATED_TIME
+      a   |1  |1     |2015-10-01
+      b   |2  |10.2  |
 ```
