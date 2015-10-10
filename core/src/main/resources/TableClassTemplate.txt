@@ -43,7 +43,7 @@ public class @table.getName().app_methodName() {
     @{String columnName = column.getName()}
     @if(isSinglePKColumn(columnName)) {
         @{columnName = "id"}
-        @if(column.getJavaType().getSimpleName().equals("String")) {@@Name} else {@@Id}
+        @if(column.getJavaType().getSimpleName().equals("String")) {@@Name @@Prev(els = @@EL("uuid(32)"))} else {@@Id}
     }
     @@Column("@column.getName()")
     @@ColDefine(

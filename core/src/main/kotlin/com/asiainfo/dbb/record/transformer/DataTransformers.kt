@@ -15,7 +15,7 @@ object DataTransformers : Registrator<String, DataTransformer> () {
         }
 
         override fun execute(): String? {
-            return R.UU32()
+            return R.UU32().toUpperCase()
         }
     }
 }

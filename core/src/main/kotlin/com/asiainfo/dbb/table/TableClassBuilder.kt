@@ -36,14 +36,14 @@ class TableClassBuilder(val tables: List<Table>) {
         return classes
     }
 
-    fun buildClassesInFile(tableClassPackage: String, path: String, template: String? = null) {
+    fun buildJavaFile(tableClassPackage: String, path: String, template: String? = null) {
         Files.deleteDir(File(path))
         tables.forEach {
-            buildClassInFile(tableClassPackage, it, path, template ?: defaultTemplate)
+            buildJavaFile(tableClassPackage, it, path, template ?: defaultTemplate)
         }
     }
 
-    private fun buildClassContent(tableClassPackage: String, table: Table, template: String): String {
+    private fun buildJavaSource(tableClassPackage: String, table: Table, template: String): String {
         return rythm.render(template, mapOf(
                 "table" to table,
                 "packageName" to tableClassPackage
@@ -55,7 +55,7 @@ class TableClassBuilder(val tables: List<Table>) {
     }
 
     private fun buildClassInMemory(tableClassPackage: String, table: Table): Class<*>? {
-        val source = buildClassContent(tableClassPackage, table, defaultTemplate)
+        val source = buildJavaSource(tableClassPackage, table, defaultTemplate)
 
         val clazz = DynamicClassLoaderEngine.loadClassFromSource(tableClassPackage + "." + getClassName(table.name), source)
         if (clazz == null) {
@@ -67,8 +67,8 @@ class TableClassBuilder(val tables: List<Table>) {
         return clazz
     }
 
-    private fun buildClassInFile(tableClassPackage: String, table: Table, path: String, template: String) {
-        val source = buildClassContent(tableClassPackage, table, template)
+    private fun buildJavaFile(tableClassPackage: String, table: Table, path: String, template: String) {
+        val source = buildJavaSource(tableClassPackage, table, template)
 
         val fileName = getClassName(table.name) + ".java"
 

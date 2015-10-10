@@ -53,7 +53,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
                                       tableClassPath: String,
                                       template: String? = null) {
         val tables = TableManager.createWithDocument(dao, content).getTables()
-        TableClassBuilder(tables).buildClassesInFile(packageName, tableClassPath, template)
+        TableClassBuilder(tables).buildJavaFile(packageName, tableClassPath, template)
     }
 
     fun createTablesInPackage(packageName: String, dropIfExist: Boolean) {

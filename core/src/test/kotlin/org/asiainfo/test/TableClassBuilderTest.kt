@@ -9,9 +9,9 @@ import org.nutz.lang.Files
 class TableClassBuilderTest : IocTest() {
 
     @Test
-    fun buildClassesInMemory() {
+    fun buildJavaFile() {
         TableClassBuilder(TableManager.createWithDocument(dao(), Files.read("tables.yml")).getTables())
-                .buildClassesInMemory("com.asiainfo.test.entity")
+                .buildJavaFile("com.asiainfo.test.entity", "~/tmp/entity")
     }
 
     @Test
