@@ -117,7 +117,7 @@ object Commands {
         }
 
         override fun execute(option: Option) {
-            formatter.printHelp("java class", options, true)
+            formatter.printHelp("dbb", options, true)
         }
     }
 
