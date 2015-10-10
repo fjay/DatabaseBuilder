@@ -10,13 +10,13 @@ tables:
   indexes:
   - type : PK
     columns :
-    - name
+    - NAME
 
   - type : INDEX
     name : IDX_AGE
     columns :
-    - age
-    - created_time
+    - AGE
+    - CREATED_TIME
 
 - name : TEST2
   comment : 测试表2

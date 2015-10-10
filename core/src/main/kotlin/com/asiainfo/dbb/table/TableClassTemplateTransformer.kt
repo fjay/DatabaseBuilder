@@ -5,6 +5,15 @@ import org.rythmengine.extension.Transformer
 
 @Transformer
 object TableClassTemplateTransformer {
+
+    @JvmStatic fun fieldName(cs: String): String {
+        return Strings.upperWord(cs.toLowerCase(), '_')
+    }
+
+    @JvmStatic fun methodName(cs: String): String {
+        return Strings.upperFirst(Strings.upperWord(cs.toLowerCase(), '_'))
+    }
+
     @JvmStatic fun upperWord(cs: String): String {
         return Strings.upperWord(cs, '_')
     }

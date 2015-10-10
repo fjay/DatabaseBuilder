@@ -17,7 +17,7 @@ import org.nutz.dao.entity.annotation.*;
 
 @def renderPKAnnotation() {
     @if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1){
-        @@PK({@table.getPrimaryKey().getColumns().app_format().app_upperWord()})
+        @@PK({@table.getPrimaryKey().getColumns().app_format().app_fieldName()})
     }
 }
 
@@ -26,22 +26,18 @@ import org.nutz.dao.entity.annotation.*;
         @@TableIndexes({
         @for(com.asiainfo.dbb.model.Index index : table.getIndexes()) {
            @@Index(name = "@index.getName()",
-                   fields = {@index.getColumns().app_format().app_upperWord()},
+                   fields = {@index.getColumns().app_format().app_fieldName()},
                    unique = @index.getType().name().equals("UNIQUE")) @if(!index_isLast) { , }
         }
         })
     }
 }
 
-@def renderMethodName(String columnName){
-@columnName.toLowerCase().app_upperWord().app_upperFirst()
-}
-
 @@Table("@table.getName()")
 @@Comment("@table.getComment()")
 @renderPKAnnotation()
 @renderIndexesAnnotation()
-public class @table.getName().toLowerCase().app_upperWord().app_upperFirst() {
+public class @table.getName().app_methodName() {
 
 @for(com.asiainfo.dbb.model.Column column : table.getColumns()) {
     @{String columnName = column.getName()}
@@ -57,7 +53,7 @@ public class @table.getName().toLowerCase().app_upperWord().app_upperFirst() {
         ,notNull = @if(column.getNullable()) {false} else {true}
     )
     @@Comment("@column.getComment()")
-    private @column.getJavaType().getSimpleName() @columnName.toLowerCase().app_upperWord();
+    private @column.getJavaType().getSimpleName() @columnName.app_fieldName();
 
 }
 
@@ -66,11 +62,11 @@ public class @table.getName().toLowerCase().app_upperWord().app_upperFirst() {
     @if(isSinglePKColumn(columnName)) {
         @{columnName = "id"}
     }
-    public @column.getJavaType().getSimpleName() get@renderMethodName(columnName) () {
-        return @columnName.toLowerCase().app_upperWord();
+    public @column.getJavaType().getSimpleName() get@columnName.app_methodName() () {
+        return @columnName.app_fieldName();
     }
-    public void set@renderMethodName(columnName) (@column.getJavaType().getSimpleName() obj) {
-        @columnName.toLowerCase().app_upperWord() = obj;
+    public void set@columnName.app_methodName() (@column.getJavaType().getSimpleName() obj) {
+        @columnName.app_fieldName() = obj;
     }
 
 }
