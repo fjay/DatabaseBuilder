@@ -12,18 +12,15 @@ import java.util.*
 
 object RecordDocumentParser {
 
-    fun parse(tables: List<Table>, text: String): List<Record> {
+    fun parse(text: String, tableProvider: (String) -> Table): List<Record> {
         val result = ArrayList<Record>()
         val mapper = ObjectMapper(YAMLFactory());
         val doc = mapper.readValue(text, RecordDocument::class.java);
 
         for (it in doc.records) {
-            val tableName = it.table ?: throw IllegalArgumentException("Invalid table")
-
-            val table = tables.find { it.name == tableName } ?:
-                    throw IllegalArgumentException("Invalid table")
-
-            val data = it.data ?: throw IllegalArgumentException("Invalid data")
+            val tableName = it.table!!
+            val table = tableProvider(tableName)
+            val data = it.data!!
 
             val loadMethod = Record.LoadMethod.valueOf(it.loadMethod!!)
 
@@ -42,7 +39,7 @@ object RecordDocumentParser {
                 val columnName = it.key
                 val column = table.columns.find {
                     it.name == columnName
-                } ?: throw  IllegalArgumentException("Invalid column")
+                } ?: throw  IllegalArgumentException("Invalid column(name=$columnName)")
 
                 val value = it.value.castTo(column.javaType)
                 columnData.add(Record.ColumnData(column, value))
@@ -59,10 +56,11 @@ object RecordDocumentParser {
             return null
         }
 
-        val dt = DataTransformers[this!!]
-        val value = (if (dt != null) dt.execute() else this) ?: return null
+        var value = this!!.trim()
+        val dt = DataTransformers[value]
+        value = (if (dt != null) dt.execute() else value) ?: return null
 
-        return Castors.create().castTo(value.trim(), toClass)
+        return Castors.create().castTo(value, toClass)
     }
 
     private class RecordDocument {

@@ -5,21 +5,57 @@ import org.nutz.dao.Dao
 
 class TableManager {
 
-    val tables: List<Table>
+    companion object {
 
-    val dao: Dao
+        fun createWithDocument(dao: Dao, text: String): Tables {
+            return TablesInDocument(dao, text)
+        }
 
-    constructor(dao: Dao, text: String) {
-        this.dao = dao
-        tables = TableDocumentParser.parse(text)
+        fun createWithDB(dao: Dao): Tables {
+            return TablesInDB(dao)
+        }
     }
 
-    constructor(dao: Dao) {
-        this.dao = dao
-        tables = TableMetaDataLoader(dao).load()
+    interface Tables {
+
+        val dao: Dao
+
+        fun getTable(name: String): Table?
+
+        fun getTables(): List<Table>
+
     }
 
-    fun getTable(name: String): Table? {
-        return tables.find { it.name == name }
+    private class TablesInDocument(override val dao: Dao, val document: String) : Tables {
+
+        private val tables: List<Table>
+
+        init {
+            tables = TableDocumentParser.parse(document)
+        }
+
+        override fun getTable(name: String): Table? {
+            return tables.find { it.name == name }
+        }
+
+        override fun getTables(): List<Table> {
+            return tables
+        }
+    }
+
+    private class TablesInDB(override val dao: Dao) : Tables {
+
+        override fun getTable(name: String): Table? {
+            val tables = TableMetaDataLoader(dao).load(name)
+            if (tables.isEmpty()) {
+                return null
+            } else {
+                return tables.first()
+            }
+        }
+
+        override fun getTables(): List<Table> {
+            return TableMetaDataLoader(dao).load()
+        }
     }
 }

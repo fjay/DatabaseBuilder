@@ -26,7 +26,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
     }
 
     fun createTablesWithContent(content: String, packageName: String) {
-        val tables = TableManager(dao, content).tables
+        val tables = TableManager.createWithDocument(dao, content).getTables()
 
         for (clazz in TableClassBuilder(tables).buildClassesInMemory(packageName)) {
             dao.create(clazz, true)
@@ -52,7 +52,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
                                       packageName: String,
                                       tableClassPath: String,
                                       template: String? = null) {
-        val tables = TableManager(dao, content).tables
+        val tables = TableManager.createWithDocument(dao, content).getTables()
         TableClassBuilder(tables).buildClassesInFile(packageName, tableClassPath, template)
     }
 
@@ -69,11 +69,11 @@ class DatabaseBuilder(val dataSource: DataSource) {
     }
 
     fun fillDataWithContent(content: String) {
-        RecordManager(TableManager(dao), content).execute()
+        RecordManager(TableManager.createWithDB(dao), content).execute()
     }
 
     fun toTableDocument(): String {
-        return TableDocumentParser.toDocument(TableManager(dao).tables)
+        return TableDocumentParser.toDocument(TableManager.createWithDB(dao).getTables())
     }
 
     fun toTableDocument(filePath: String) {

@@ -14,9 +14,10 @@ class DocumentParserTest {
 
     @Test
     fun parseRecords() {
-        val records = RecordDocumentParser.parse(
-                TableDocumentParser.parse(Files.read("tables.yml")),
-                Files.read("records.yml"))
+        val tables = TableDocumentParser.parse(Files.read("tables.yml"))
+        val records = RecordDocumentParser.parse(Files.read("records.yml")) { name ->
+            tables.find { it.name == name }!!
+        }
         println(records)
     }
 

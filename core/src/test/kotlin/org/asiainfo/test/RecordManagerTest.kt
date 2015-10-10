@@ -8,8 +8,8 @@ import org.nutz.lang.Files
 
 class RecordManagerTest : IocTest() {
 
-    private fun getTableManager(): TableManager {
-        return TableManager(dao())
+    private fun getTableManager(): TableManager.Tables {
+        return TableManager.createWithDB(dao())
     }
 
     @Test

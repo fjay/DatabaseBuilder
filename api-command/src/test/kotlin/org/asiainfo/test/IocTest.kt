@@ -12,7 +12,7 @@ import org.nutz.test.junit48.NutJunit48Runner
 import javax.sql.DataSource
 
 @RunWith(NutJunit48Runner::class)
-@IocBy(type = ComboIocProvider::class, args = arrayOf("*org.nutz.ioc.loader.json.JsonLoader", "/ioc"))
+@IocBy(type = ComboIocProvider::class, args = arrayOf("*org.nutz.ioc.loader.json.JsonLoader", "ioc"))
 open class IocTest {
 
     private val ioc = lazy { NutTestContext.me().ioc }

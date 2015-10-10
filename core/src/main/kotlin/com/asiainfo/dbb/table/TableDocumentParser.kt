@@ -74,10 +74,16 @@ object TableDocumentParser {
 
         tables.forEach { t ->
             seg.set(t.name, "|\n" + DataTableUtil.format(t.columns.map {
+                val length = if (it.precision == null || it.precision == 0) {
+                    it.width.toString()
+                } else {
+                    it.width.toString() + "," + it.precision
+                }
+
                 linkedMapOf(
                         "\t" + TableDocument.ColumnKey.NAME.name() to "\t" + it.name,
                         TableDocument.ColumnKey.TYPE.name() to it.type.name(),
-                        TableDocument.ColumnKey.LENGTH.name() to it.width,
+                        TableDocument.ColumnKey.LENGTH.name() to length,
                         TableDocument.ColumnKey.NULLABLE.name() to it.nullable,
                         TableDocument.ColumnKey.COMMENT.name() to it.comment
                 )
@@ -93,7 +99,7 @@ object TableDocumentParser {
             val type = ColType.valueOf(map.getNotNullColumn(TableDocument.ColumnKey.TYPE))
 
             val name = map.getNotNullColumn(TableDocument.ColumnKey.NAME)
-            val nullable = Lang.parseBoolean(map.getColumn(TableDocument.ColumnKey.NULLABLE) ?: "1")
+            val nullable = Lang.parseBoolean(map.getProperty(TableDocument.ColumnKey.NULLABLE) ?: "1")
             val (width, precision) = getColumnLength(map)
 
             result.add(Column(
@@ -104,7 +110,7 @@ object TableDocumentParser {
                     javaType = asJavaType(type),
                     pk = pk?.name == name,
                     nullable = nullable,
-                    comment = map[TableDocument.ColumnKey.COMMENT.name()]
+                    comment = map.getProperty(TableDocument.ColumnKey.COMMENT)
             ))
         }
 
@@ -166,7 +172,7 @@ object TableDocumentParser {
     }
 
     private fun getColumnLength(map: Map<String, String>): Pair<Int?, Int?> {
-        val lengthString = map.getColumn(TableDocument.ColumnKey.LENGTH) ?: return Pair(null, null)
+        val lengthString = map.getProperty(TableDocument.ColumnKey.LENGTH) ?: return Pair(null, null)
 
         val lengthPair = lengthString.split(",")
         val width = lengthPair[0].toInt()
@@ -174,7 +180,7 @@ object TableDocumentParser {
         return Pair(width, precision)
     }
 
-    private fun Map<String, String>.getColumn(key: TableDocument.ColumnKey): String? {
+    private fun Map<String, String>.getProperty(key: TableDocument.ColumnKey): String? {
         val value = this[key.name()]
 
         if (Strings.isBlank(value)) {
@@ -185,7 +191,7 @@ object TableDocumentParser {
     }
 
     private fun Map<String, String>.getNotNullColumn(key: TableDocument.ColumnKey) =
-            this.getColumn(key) ?: throw IllegalArgumentException("Invalid ColumnKey:$key")
+            this.getProperty(key) ?: throw IllegalArgumentException("Invalid ColumnKey:$key")
 
     private class TableDocument {
 

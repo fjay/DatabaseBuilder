@@ -10,12 +10,12 @@ class TableClassBuilderTest : IocTest() {
 
     @Test
     fun buildClassesInMemory() {
-        TableClassBuilder(TableManager(dao(), Files.read("tables.yml")).tables)
+        TableClassBuilder(TableManager.createWithDocument(dao(), Files.read("tables.yml")).getTables())
                 .buildClassesInMemory("com.asiainfo.test.entity")
     }
 
     @Test
     fun toTableDocument() {
-        println(TableDocumentParser.toDocument(TableManager(dao()).tables))
+        println(TableDocumentParser.toDocument(TableManager.createWithDB(dao()).getTables()))
     }
 }

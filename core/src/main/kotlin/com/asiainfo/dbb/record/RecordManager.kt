@@ -6,20 +6,20 @@ import org.nutz.dao.Chain
 import org.nutz.dao.Dao
 import org.nutz.log.Logs
 
-class RecordManager {
+class RecordManager(val tables: TableManager.Tables, val text: String) {
 
     private val records: List<Record>
-
-    private val tableManager: TableManager
 
     private val dao: Dao
 
     private val log = Logs.get()
 
-    constructor(tableManager: TableManager, text: String) {
-        this.tableManager = tableManager
-        records = RecordDocumentParser.parse(tableManager.tables, text)
-        dao = tableManager.dao
+    init {
+        records = RecordDocumentParser.parse(text) {
+            tables.getTable(it) ?: throw IllegalArgumentException("无效的表名(name=$it)")
+        }
+
+        dao = tables.dao
     }
 
     fun execute() {
