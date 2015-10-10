@@ -56,10 +56,7 @@ object RecordDocumentParser {
             return null
         }
 
-        var value = this!!.trim()
-        val dt = DataTransformers[value]
-        value = (if (dt != null) dt.execute() else value) ?: return null
-
+        var value = DataTransformers.execute(this!!.trim()) ?: return null
         return Castors.create().castTo(value, toClass)
     }
 

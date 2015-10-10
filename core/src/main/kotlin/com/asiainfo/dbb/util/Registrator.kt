@@ -6,7 +6,7 @@ open class Registrator<K, V : Registrator.Applicant<K>> {
 
     private val map = HashMap<K, V>()
 
-    fun register(value: V) {
+    open fun register(value: V) {
         map[value.getKey()] = value
     }
 

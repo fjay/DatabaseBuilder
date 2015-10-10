@@ -1,8 +1,6 @@
 package com.asiainfo.dbb.record.transformer
 
-import com.asiainfo.dbb.util.Registrator
+interface DataTransformer {
 
-interface DataTransformer : Registrator.Applicant<String> {
-
-    fun execute(): String?
+    fun getKey(): String
 }
