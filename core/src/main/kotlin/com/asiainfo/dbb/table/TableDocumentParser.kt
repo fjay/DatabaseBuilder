@@ -74,7 +74,7 @@ object TableDocumentParser {
 
         tables.forEach { t ->
             seg.set(t.name, "|\n" + DataTableUtil.format(t.columns.map {
-                val length = if (it.precision == null || it.precision == 0) {
+                val length = if (it.precision == null || it.precision <= 0) {
                     it.width.toString()
                 } else {
                     it.width.toString() + "," + it.precision
