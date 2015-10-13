@@ -32,11 +32,8 @@ object DynamicClassLoaderEngine {
     }
 
     fun loadClassFromSource(fullClassName: String, javaCode: String): Class<*>? {
-        val compiler = ToolProvider.getSystemJavaCompiler()
-        if (compiler == null) {
-            log.info(System.getProperty("java.home"))
-            throw RuntimeException("Please set JAVA_HOME first")
-        }
+        val compiler = ToolProvider.getSystemJavaCompiler() ?:
+                throw RuntimeException("Please use jdk instead of jre(home=${System.getProperty("java.home")})")
 
         val diagnostics = DiagnosticCollector<JavaFileObject>()
         val fileManager = ClassFileManager(compiler.getStandardFileManager(diagnostics, null, null))
