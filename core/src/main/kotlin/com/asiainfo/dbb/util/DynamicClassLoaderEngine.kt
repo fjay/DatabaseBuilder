@@ -33,6 +33,11 @@ object DynamicClassLoaderEngine {
 
     fun loadClassFromSource(fullClassName: String, javaCode: String): Class<*>? {
         val compiler = ToolProvider.getSystemJavaCompiler()
+        if (compiler == null) {
+            log.info(System.getProperty("java.home"))
+            throw RuntimeException("Please set JAVA_HOME first")
+        }
+
         val diagnostics = DiagnosticCollector<JavaFileObject>()
         val fileManager = ClassFileManager(compiler.getStandardFileManager(diagnostics, null, null))
         val files = arrayListOf(CharSequenceJavaFileObject(fullClassName, javaCode))

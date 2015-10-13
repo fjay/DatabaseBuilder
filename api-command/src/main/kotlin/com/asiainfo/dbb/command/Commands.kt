@@ -39,14 +39,14 @@ object Commands : Registrator<String, Commands.Command>() {
             val commandLine = DefaultParser().parse(options, args)
             var hasOption = false
 
-            applicants.forEach { key, command ->
-                if (commandLine.hasOption(key)) {
+            applicants.forEach { entry ->
+                if (commandLine.hasOption(entry.key)) {
                     hasOption = true
 
                     val option = commandLine.options.find {
-                        it.opt == key
+                        it.opt == entry.key
                     }
-                    command!!.execute(option!!)
+                    entry.value.execute(option!!)
                 }
             }
 
@@ -102,6 +102,7 @@ object Commands : Registrator<String, Commands.Command>() {
                     url = map["jdbc.url"]
                     username = map["jdbc.username"]
                     password = map["jdbc.password"]
+                    isTestWhileIdle = false
                 }
             }
         }
