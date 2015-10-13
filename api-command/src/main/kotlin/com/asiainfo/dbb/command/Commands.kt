@@ -21,6 +21,7 @@ object Commands : Registrator<String, Commands.Command>() {
         register(CreateTable())
         register(FillData())
         register(CreateTableDocument())
+        register(CreateRecordDocument())
     }
 
     override fun register(value: Command) {
@@ -30,9 +31,11 @@ object Commands : Registrator<String, Commands.Command>() {
     }
 
     fun execute(args: Array<String>) {
+        val context = CommandContext()
+
         val doHelp = {
             val help = get(HELP_KEY)
-            help!!.execute(help.option)
+            help!!.execute(help.option, context)
         }
 
         try {
@@ -46,7 +49,7 @@ object Commands : Registrator<String, Commands.Command>() {
                     val option = commandLine.options.find {
                         it.opt == entry.key
                     }
-                    entry.value.execute(option!!)
+                    entry.value.execute(option!!, context)
                 }
             }
 
@@ -60,51 +63,53 @@ object Commands : Registrator<String, Commands.Command>() {
 
     private abstract class Command(val keyForCommand: String) : Registrator.Applicant<String> {
 
-        protected var context = lazy { Context() }
-
         abstract val option: Option
 
         override fun getKey(): String {
             return keyForCommand
         }
 
-        abstract fun execute(option: Option)
+        abstract fun execute(option: Option, context: CommandContext)
+    }
 
-        protected class Context {
+    private class CommandContext {
 
-            val map = PropertiesProxy("config/config.properties").let { p ->
-                val map = HashMap<String, String>()
+        val map = PropertiesProxy("config/config.properties").let { p ->
+            val map = HashMap<String, String>()
 
-                p.keys.forEach {
-                    var value = p.get(it)
-                    if (!Strings.isBlank(value)) {
-                        map[it] = value
-                    }
-                }
-
-                map
-            }
-
-            val tableFilePath: String by map
-
-            val tableClassPackage: String  by map
-
-            val tableClassPath: String by map
-
-            val tableClassTemplatePath = map["tableClassTemplatePath"]
-
-            val recordFilePath: String  by map
-
-            val tableDocumentPath: String by map
-
-            val dataSource = lazy {
-                DruidDataSource().apply {
-                    url = map["jdbc.url"]
-                    username = map["jdbc.username"]
-                    password = map["jdbc.password"]
-                    isTestWhileIdle = false
+            p.keys.forEach {
+                var value = p.get(it)
+                if (!Strings.isBlank(value)) {
+                    map[it] = value
                 }
             }
+
+            map
+        }
+
+        val tableFilePath: String by map
+
+        val tableClassPackage: String  by map
+
+        val tableClassPath: String by map
+
+        val tableClassTemplatePath = map["tableClassTemplatePath"]
+
+        val recordFilePath: String  by map
+
+        val tableDocumentPath: String by map
+
+        val recordDocumentPath: String by map
+
+        var builder = lazy {
+            val dataSource = DruidDataSource().apply {
+                url = map["jdbc.url"]
+                username = map["jdbc.username"]
+                password = map["jdbc.password"]
+                isTestWhileIdle = false
+            }
+
+            DatabaseBuilder(dataSource)
         }
     }
 
@@ -118,7 +123,7 @@ object Commands : Registrator<String, Commands.Command>() {
             isRequired = false
         }
 
-        override fun execute(option: Option) {
+        override fun execute(option: Option, context: CommandContext) {
             formatter.printHelp("dbb", options, true)
         }
     }
@@ -129,12 +134,12 @@ object Commands : Registrator<String, Commands.Command>() {
             isRequired = false
         }
 
-        override fun execute(option: Option) {
-            DatabaseBuilder(context.value.dataSource.value).createTableClassesWithFilePath(
-                    context.value.tableFilePath,
-                    context.value.tableClassPackage,
-                    context.value.tableClassPath,
-                    context.value.tableClassTemplatePath
+        override fun execute(option: Option, context: CommandContext) {
+            context.builder.value.createTableClassesWithFilePath(
+                    context.tableFilePath,
+                    context.tableClassPackage,
+                    context.tableClassPath,
+                    context.tableClassTemplatePath
             )
         }
     }
@@ -145,10 +150,8 @@ object Commands : Registrator<String, Commands.Command>() {
             isRequired = false
         }
 
-        override fun execute(option: Option) {
-            DatabaseBuilder(context.value.dataSource.value).createTablesWithFilePath(
-                    context.value.tableFilePath, context.value.tableClassPackage
-            )
+        override fun execute(option: Option, context: CommandContext) {
+            context.builder.value.createTablesWithFilePath(context.tableFilePath, context.tableClassPackage)
         }
     }
 
@@ -158,21 +161,30 @@ object Commands : Registrator<String, Commands.Command>() {
             isRequired = false
         }
 
-        override fun execute(option: Option) {
-            DatabaseBuilder(context.value.dataSource.value)
-                    .fillDataWithFilePath(context.value.recordFilePath)
+        override fun execute(option: Option, context: CommandContext) {
+            context.builder.value.fillDataWithFilePath(context.recordFilePath)
         }
     }
 
     private class CreateTableDocument : Command("ctd") {
         override val option = Option(keyForCommand, "create-table-document",
-                false, "反向生成DatabaseBuilder文本结构").apply {
+                false, "反向生成表结构文本结构").apply {
             isRequired = false
         }
 
-        override fun execute(option: Option) {
-            DatabaseBuilder(context.value.dataSource.value)
-                    .toTableDocument(context.value.tableDocumentPath)
+        override fun execute(option: Option, context: CommandContext) {
+            context.builder.value.toTableDocument(context.tableDocumentPath)
+        }
+    }
+
+    private class CreateRecordDocument : Command("crd") {
+        override val option = Option(keyForCommand, "create-record-document",
+                false, "反向生成数据文本结构").apply {
+            isRequired = false
+        }
+
+        override fun execute(option: Option, context: CommandContext) {
+            context.builder.value.toRecordDocument(context.recordDocumentPath)
         }
     }
 }

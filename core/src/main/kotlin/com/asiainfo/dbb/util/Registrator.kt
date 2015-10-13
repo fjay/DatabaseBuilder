@@ -4,7 +4,7 @@ import java.util.*
 
 open class Registrator<K, V : Registrator.Applicant<K>> {
 
-    protected val applicants = HashMap<K, V>()
+    protected val applicants = LinkedHashMap<K, V>()
 
     open fun register(value: V) {
         applicants[value.getKey()] = value

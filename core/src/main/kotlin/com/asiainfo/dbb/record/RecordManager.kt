@@ -35,12 +35,12 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
         }
     }
 
-    fun toDocument(vararg tables: String): String {
-        val tables = if (tables.isEmpty()) {
+    fun toDocument(vararg tableNames: String): String {
+        val tables = if (tableNames.isEmpty()) {
             TableManager.createWithDB(dao).getTables()
         } else {
             val t = TableManager.createWithDB(dao)
-            tables.map {
+            tableNames.map {
                 t.getTable(it)!!
             }
         }
