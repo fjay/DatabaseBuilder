@@ -191,7 +191,7 @@ object TableDocumentParser {
     }
 
     private fun Map<String, String>.getNotNullColumn(key: TableDocument.ColumnKey) =
-            this.getProperty(key) ?: throw IllegalArgumentException("Invalid ColumnKey:$key")
+            this.getProperty(key) ?: throw IllegalArgumentException("Invalid column property:$key")
 
     private class TableDocument {
 

@@ -14,7 +14,7 @@ import java.util.*
 
 class TableMetaDataLoader(val dao: Dao) {
 
-    private val adapter = DatabaseAdapters[dao.meta().type] ?: throw UnsupportedOperationException("暂不支持该数据库")
+    private val adapter = DatabaseAdapters[dao.meta().type] ?: throw RuntimeException("Unsupported database")
 
     fun load(tableNamePattern: String = "%"): List<Table> {
         val tables = ArrayList<Table>()
@@ -51,7 +51,7 @@ class TableMetaDataLoader(val dao: Dao) {
 
     private fun parseColumn(record: org.nutz.dao.entity.Record, pk: Index?): Column {
         val type = adapter.asColType(record) ?:
-                throw RuntimeException("Unknown column type:" + adapter.getTypeName(record))
+                throw IllegalArgumentException("Unknown column type:" + adapter.getTypeName(record))
 
         val name = record.getString("column_name")
         return Column(

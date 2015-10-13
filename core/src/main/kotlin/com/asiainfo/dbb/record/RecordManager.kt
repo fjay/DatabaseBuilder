@@ -16,7 +16,7 @@ class RecordManager(val tables: TableManager.Tables, val text: String) {
 
     init {
         records = RecordDocumentParser.parse(text) {
-            tables.getTable(it) ?: throw IllegalArgumentException("无效的表名(name=$it)")
+            tables.getTable(it) ?: throw IllegalArgumentException("Invalid table(name=$it)")
         }
 
         dao = tables.dao
