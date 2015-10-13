@@ -5,12 +5,12 @@ import com.asiainfo.dbb.table.TableManager
 import org.nutz.dao.Chain
 import org.nutz.dao.Dao
 import org.nutz.log.Logs
+import java.io.Writer
 
-class RecordManager(val tables: TableManager.Tables, val text: String) {
+class RecordManager(val dao: Dao, val tables: TableManager.Tables, val text: String) {
 
     private val records: List<Record>
 
-    private val dao: Dao
 
     private val log = Logs.get()
 
@@ -18,8 +18,6 @@ class RecordManager(val tables: TableManager.Tables, val text: String) {
         records = RecordDocumentParser.parse(text) {
             tables.getTable(it) ?: throw IllegalArgumentException("Invalid table(name=$it)")
         }
-
-        dao = tables.dao
     }
 
     fun execute() {
@@ -37,6 +35,22 @@ class RecordManager(val tables: TableManager.Tables, val text: String) {
                 Record.LoadMethod.INSERT -> {
                     insert(it)
                 }
+            }
+        }
+    }
+
+    fun toDocument(writer: Writer, vararg tables: String) {
+        val tableNames = if (tables.isEmpty()) {
+            TableManager.createWithDB(dao).getTables().map {
+                it.name
+            }
+        } else {
+            tables.asList()
+        }
+
+        for (it in tableNames) {
+            dao.each(it, null) { index, ele, length ->
+                writer.write(RecordDocumentParser.toDocument(listOf(ele)))
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.asiainfo.dbb
 
+import com.asiainfo.dbb.record.RecordDocumentParser
 import com.asiainfo.dbb.record.RecordManager
 import com.asiainfo.dbb.table.TableClassBuilder
 import com.asiainfo.dbb.table.TableDocumentParser
@@ -26,7 +27,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
     }
 
     fun createTablesWithContent(content: String, packageName: String) {
-        val tables = TableManager.createWithDocument(dao, content).getTables()
+        val tables = TableManager.createWithDocument(content).getTables()
 
         for (clazz in TableClassBuilder(tables).buildClassesInMemory(packageName)) {
             dao.create(clazz, true)
@@ -52,7 +53,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
                                       packageName: String,
                                       tableClassPath: String,
                                       template: String? = null) {
-        val tables = TableManager.createWithDocument(dao, content).getTables()
+        val tables = TableManager.createWithDocument(content).getTables()
         TableClassBuilder(tables).buildJavaFile(packageName, tableClassPath, template)
     }
 
@@ -69,7 +70,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
     }
 
     fun fillDataWithContent(content: String) {
-        RecordManager(TableManager.createWithDB(dao), content).execute()
+        RecordManager(dao, TableManager.createWithDB(dao), content).execute()
     }
 
     fun toTableDocument(): String {
@@ -82,4 +83,5 @@ class DatabaseBuilder(val dataSource: DataSource) {
         Files.write(file, toTableDocument())
         log.debugf("Write table document success(file=%s)", filePath)
     }
+
 }

@@ -41,8 +41,8 @@ object TableDocumentParser {
 
     fun toDocument(tables: List<Table>): String {
         val doc = TableDocument()
-        tables.forEach { t ->
-            val table = TableDocument.Table().apply {
+        for (t in tables) {
+            val tableInDoc = TableDocument.Table().apply {
                 name = t.name
                 comment = t.comment
 
@@ -61,7 +61,7 @@ object TableDocumentParser {
                 }
             }
 
-            doc.tables.add(table)
+            doc.tables.add(tableInDoc)
         }
 
         return format(doc, tables)

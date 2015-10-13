@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.nutz.castor.Castors
 import org.nutz.lang.Strings
+import org.nutz.lang.segment.CharSegment
+import org.nutz.lang.stream.StringWriter
 import java.util.*
 
 object RecordDocumentParser {
@@ -29,6 +31,41 @@ object RecordDocumentParser {
         }
 
         return result
+    }
+
+    fun toDocument(records: List<Record>): String {
+        val doc = RecordDocument()
+        for (record in records) {
+            val recordInDoc = RecordDocument.Record().apply {
+                table = record.table.name
+                loadMethod = Record.LoadMethod.CLEAR_AND_INSERT.name()
+                data = "\${$table}"
+            }
+
+            doc.records.add(recordInDoc)
+        }
+
+        return format(doc, records)
+    }
+
+    private fun format(doc: RecordDocument, records: List<Record>): String {
+        val sb = StringBuilder()
+        ObjectMapper(YAMLFactory()).writeValue(StringWriter(sb), doc)
+        val seg = CharSegment(sb.toString().replace("\"", ""));
+
+        records.forEach { record ->
+            seg.set(record.table.name, "|\n" + DataTableUtil.format(record.data.map {
+                val map = LinkedHashMap<String, String?>()
+                it.columnData.forEachIndexed { i, columnData ->
+                    val indent = if (i == 0) "\t" else ""
+                    map[indent + columnData.column.name] = indent + columnData.value.castToString()
+                }
+
+                map
+            }))
+        }
+
+        return seg.toString()
     }
 
     private fun parseData(table: Table, text: String): List<Record.Data> {
@@ -58,6 +95,14 @@ object RecordDocumentParser {
 
         var value = DataTransformers.execute(this!!.trim()) ?: return null
         return Castors.create().castTo(value, toClass)
+    }
+
+    private fun Any?.castToString(): String? {
+        if (this == null) {
+            return null
+        }
+
+        return Castors.create().castTo(this, String::class.java)
     }
 
     private class RecordDocument {

@@ -7,8 +7,8 @@ class TableManager {
 
     companion object {
 
-        fun createWithDocument(dao: Dao, text: String): Tables {
-            return TablesInDocument(dao, text)
+        fun createWithDocument(text: String): Tables {
+            return TablesInDocument(text)
         }
 
         fun createWithDB(dao: Dao): Tables {
@@ -18,15 +18,13 @@ class TableManager {
 
     interface Tables {
 
-        val dao: Dao
-
         fun getTable(name: String): Table?
 
         fun getTables(): List<Table>
 
     }
 
-    private class TablesInDocument(override val dao: Dao, val document: String) : Tables {
+    private class TablesInDocument(val document: String) : Tables {
 
         private val tables: List<Table>
 
@@ -43,7 +41,7 @@ class TableManager {
         }
     }
 
-    private class TablesInDB(override val dao: Dao) : Tables {
+    private class TablesInDB(val dao: Dao) : Tables {
 
         override fun getTable(name: String): Table? {
             val tables = TableMetaDataLoader(dao).load(name)
