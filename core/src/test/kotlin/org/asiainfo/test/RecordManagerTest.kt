@@ -11,7 +11,7 @@ class RecordManagerTest : IocTest() {
 
     @Test
     fun insert() {
-        RecordManager(dao(), TableManager.createWithDB(dao()), Files.read("records.yml")).execute()
+        RecordManager(dao(), TableManager.createWithDB(dao())).fillData(Files.read("records.yml"))
     }
 
     @Test

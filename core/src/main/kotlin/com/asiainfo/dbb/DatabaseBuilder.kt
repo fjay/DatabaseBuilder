@@ -1,6 +1,5 @@
 package com.asiainfo.dbb
 
-import com.asiainfo.dbb.record.RecordDocumentParser
 import com.asiainfo.dbb.record.RecordManager
 import com.asiainfo.dbb.table.TableClassBuilder
 import com.asiainfo.dbb.table.TableDocumentParser
@@ -70,7 +69,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
     }
 
     fun fillDataWithContent(content: String) {
-        RecordManager(dao, TableManager.createWithDB(dao), content).execute()
+        RecordManager(dao, TableManager.createWithDB(dao)).fillData(content)
     }
 
     fun toTableDocument(): String {
@@ -84,4 +83,14 @@ class DatabaseBuilder(val dataSource: DataSource) {
         log.debugf("Write table document success(file=%s)", filePath)
     }
 
+    fun toRecordDocument(): String {
+        return RecordManager(dao, TableManager.createWithDB(dao)).toDocument()
+    }
+
+    fun toRecordDocument(filePath: String) {
+        val file = File(filePath)
+        Files.deleteFile(file)
+        Files.write(file, toTableDocument())
+        log.debugf("Write record document success(file=%s)", filePath)
+    }
 }

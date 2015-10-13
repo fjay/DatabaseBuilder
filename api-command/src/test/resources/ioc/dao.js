@@ -11,7 +11,8 @@ var ioc = {
             initialSize: 0,
             maxActive: 1,
             minIdle: 0,
-            defaultAutoCommit: false
+            defaultAutoCommit: false,
+            testWhileIdle: false
         }
     },
     dao: {

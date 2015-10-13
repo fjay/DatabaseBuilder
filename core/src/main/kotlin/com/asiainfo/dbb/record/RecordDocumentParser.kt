@@ -54,15 +54,20 @@ object RecordDocumentParser {
         val seg = CharSegment(sb.toString().replace("\"", ""));
 
         records.forEach { record ->
-            seg.set(record.table.name, "|\n" + DataTableUtil.format(record.data.map {
-                val map = LinkedHashMap<String, String?>()
-                it.columnData.forEachIndexed { i, columnData ->
-                    val indent = if (i == 0) "\t" else ""
-                    map[indent + columnData.column.name] = indent + columnData.value.castToString()
-                }
+            val value = if (record.data.isEmpty()) {
+                "[]"
+            } else {
+                "|\n" + DataTableUtil.format(record.data.map {
+                    val map = LinkedHashMap<String, String?>()
+                    it.columnData.forEachIndexed { i, columnData ->
+                        val indent = if (i == 0) "\t" else ""
+                        map[indent + columnData.column.name] = indent + columnData.value.castToString()
+                    }
 
-                map
-            }))
+                    map
+                })
+            }
+            seg.set(record.table.name, value)
         }
 
         return seg.toString()
@@ -93,13 +98,18 @@ object RecordDocumentParser {
             return null
         }
 
-        var value = DataTransformers.execute(this!!.trim()) ?: return null
-        return Castors.create().castTo(value, toClass)
+        val value: String = this!!.trim()
+        if (value == "null") {
+            return null
+        }
+
+        val result = DataTransformers.execute(value) ?: return null
+        return Castors.create().castTo(result, toClass)
     }
 
     private fun Any?.castToString(): String? {
         if (this == null) {
-            return null
+            return ""
         }
 
         return Castors.create().castTo(this, String::class.java)

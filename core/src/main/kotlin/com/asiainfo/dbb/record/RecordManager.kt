@@ -1,26 +1,22 @@
 package com.asiainfo.dbb.record
 
 import com.asiainfo.dbb.model.Record
+import com.asiainfo.dbb.model.Table
 import com.asiainfo.dbb.table.TableManager
 import org.nutz.dao.Chain
 import org.nutz.dao.Dao
 import org.nutz.log.Logs
-import java.io.Writer
+import java.util.*
 
-class RecordManager(val dao: Dao, val tables: TableManager.Tables, val text: String) {
-
-    private val records: List<Record>
-
+class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
 
     private val log = Logs.get()
 
-    init {
-        records = RecordDocumentParser.parse(text) {
+    fun fillData(text: String) {
+        val records = RecordDocumentParser.parse(text) {
             tables.getTable(it) ?: throw IllegalArgumentException("Invalid table(name=$it)")
         }
-    }
 
-    fun execute() {
         records.forEach {
             when (it.loadMethod) {
                 Record.LoadMethod.CLEAR_AND_INSERT -> {
@@ -39,20 +35,38 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables, val text: Str
         }
     }
 
-    fun toDocument(writer: Writer, vararg tables: String) {
-        val tableNames = if (tables.isEmpty()) {
-            TableManager.createWithDB(dao).getTables().map {
-                it.name
-            }
+    fun toDocument(vararg tables: String): String {
+        val tables = if (tables.isEmpty()) {
+            TableManager.createWithDB(dao).getTables()
         } else {
-            tables.asList()
+            val t = TableManager.createWithDB(dao)
+            tables.map {
+                t.getTable(it)!!
+            }
         }
 
-        for (it in tableNames) {
-            dao.each(it, null) { index, ele, length ->
-                writer.write(RecordDocumentParser.toDocument(listOf(ele)))
-            }
+        val result = ArrayList<Record>()
+
+        for (table in tables) {
+            result.add(Record(table, Record.LoadMethod.CLEAR_AND_INSERT, loadRecords(table)))
         }
+
+        return RecordDocumentParser.toDocument(result)
+    }
+
+    private fun loadRecords(table: Table): ArrayList<Record.Data> {
+        val recordData = ArrayList<Record.Data>()
+        dao.each(table.name, null) { index, ele, length ->
+            val columnData = ArrayList<Record.ColumnData>()
+
+            table.columns.forEach {
+                columnData.add(Record.ColumnData(it, ele.get(it.name)))
+            }
+
+            recordData.add(Record.Data(columnData))
+        }
+
+        return recordData
     }
 
     private fun insert(record: Record) {
