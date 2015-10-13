@@ -21,7 +21,13 @@ object DataTransformers {
     }
 
     fun execute(value: String): Any? {
-        return El.eval(context, value)
+        for (key in context.keys()) {
+            if (value.startsWith(key)) {
+                return El.eval(context, value)
+            }
+        }
+
+        return value
     }
 
     object StringTransformer : DataTransformer {
