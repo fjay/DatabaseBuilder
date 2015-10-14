@@ -36,7 +36,7 @@ object DataTableUtil {
         return Formatter.format(data)
     }
 
-    private object Formatter {
+    object Formatter {
 
         private val SUFFIX_MAX_LENGTH = "MaxLength"
 
@@ -146,7 +146,7 @@ object DataTableUtil {
             return builder.toString()
         }
 
-        @JvmOverloads fun padRight(self: String, numberOfChars: Number, padding: CharSequence = " "): String {
+        @JvmOverloads fun padRight(self: String, numberOfChars: Number, padding: Char = ' '): String {
             val s = self.toString()
             val numChars = numberOfChars.toInt()
             val selfLength = length(s)

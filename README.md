@@ -114,17 +114,17 @@ jdbc.password=sa
 ```
 #### JDBC依赖包
 
- 应用默认只带了hsqldb的jdbc依赖包,若需要支持其他数据库,请将对应的jdbc依赖包复制到lib文件夹下即可
+ 应用默认只带了Hsqldb和MySql的jdbc依赖包,若需要支持其他数据库,请将对应的jdbc依赖包复制到lib文件夹
 
 #### 使用方法
 
-Window平台:
+Window:
 
 ```
 dbb.bat -h
 ```
 
-Linux平台:
+Linux:
 
 ```
 ./dbb.sh -h
@@ -133,12 +133,13 @@ Linux平台:
 支持参数:
 
 ```
-usage: dbb [-ct] [-ctc] [-ctd] [-fd] [-h]
- -ct,--create-table             生成指定数据库的表结构
- -ctc,--create-table-class      生成表对应的实体类
- -ctd,--create-table-document   反向生成DatabaseBuilder文本结构
- -fd,--fill-data                生成指定表的数据记录
- -h,--help                      帮助说明
+usage: dbb [-crd] [-ct] [-ctc] [-ctd] [-fd] [-h]
+ -ct,--create-table              生成指定数据库的表结构
+ -fd,--fill-data                 生成指定表的数据记录
+ -ctc,--create-table-class       生成表对应的实体类
+ -crd,--create-record-document   反向生成数据文本结构
+ -ctd,--create-table-document    反向生成表结构文本结构
+ -h,--help                       帮助说明
 ```
 
 ### 文本结构

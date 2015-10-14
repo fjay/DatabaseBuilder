@@ -49,7 +49,11 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
         val result = ArrayList<Record>()
 
         for (table in tables) {
-            result.add(Record(table, Record.LoadMethod.CLEAR_AND_INSERT, loadData(table)))
+            try {
+                result.add(Record(table, Record.LoadMethod.CLEAR_AND_INSERT, loadData(table)))
+            } catch(e: Exception) {
+                throw RuntimeException("LoadData fail(table=${table.name})", e)
+            }
         }
 
         return RecordDocuments.toDocument(result)
