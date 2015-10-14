@@ -20,6 +20,8 @@ object MysqlAdapter : AbstractDatabaseAdapter() {
 
             "BIGINT" -> ColType.INT
 
+            "MEDIUMINT" -> ColType.INT
+
             "MediumBlob" -> ColType.BINARY
 
             "DECIMAL" -> ColType.FLOAT

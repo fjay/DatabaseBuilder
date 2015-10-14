@@ -80,8 +80,9 @@ object TableDocuments {
                     it.width.toString() + "," + it.precision
                 }
 
+                val indent = "    "
                 linkedMapOf(
-                        "\t" + TableDocument.ColumnKey.NAME.name() to "\t" + it.name,
+                        indent + TableDocument.ColumnKey.NAME.name() to indent + it.name,
                         TableDocument.ColumnKey.TYPE.name() to it.type.name(),
                         TableDocument.ColumnKey.LENGTH.name() to length,
                         TableDocument.ColumnKey.NULLABLE.name() to it.nullable,

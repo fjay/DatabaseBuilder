@@ -36,6 +36,10 @@ object RecordDocuments {
     fun toDocument(records: List<Record>): String {
         val doc = RecordDocument()
         for (record in records) {
+            if (record.data.isEmpty()) {
+                continue
+            }
+
             val recordInDoc = RecordDocument.Record().apply {
                 table = record.table.name
                 loadMethod = record.loadMethod.name()
@@ -54,19 +58,15 @@ object RecordDocuments {
         val seg = CharSegment(sb.toString().replace("\"", ""));
 
         records.forEach { record ->
-            val value = if (record.data.isEmpty()) {
-                "[]"
-            } else {
-                "|\n" + DataTableUtil.format(record.data.map {
-                    val map = LinkedHashMap<String, String?>()
-                    it.columnData.forEachIndexed { i, columnData ->
-                        val indent = if (i == 0) "\t" else ""
-                        map[indent + columnData.column.name] = indent + columnData.value.castToString()
-                    }
+            val value = "|\n" + DataTableUtil.format(record.data.map {
+                val map = LinkedHashMap<String, String?>()
+                it.columnData.forEachIndexed { i, columnData ->
+                    val indent = if (i == 0) "    " else ""
+                    map[indent + columnData.column.name] = indent + columnData.value.castToString()
+                }
 
-                    map
-                })
-            }
+                map
+            })
             seg.set(record.table.name, value)
         }
 
@@ -110,6 +110,10 @@ object RecordDocuments {
     private fun Any?.castToString(): String? {
         if (this == null) {
             return ""
+        }
+
+        if (this is Boolean) {
+            return if (this) "1" else "0"
         }
 
         return Castors.create().castTo(this, String::class.java)
