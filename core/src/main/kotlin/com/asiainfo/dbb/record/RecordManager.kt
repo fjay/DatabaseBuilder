@@ -13,7 +13,7 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
     private val log = Logs.get()
 
     fun fillData(text: String) {
-        val records = RecordDocumentParser.parse(text) {
+        val records = RecordDocuments.parse(text) {
             tables.getTable(it) ?: throw IllegalArgumentException("Invalid table(name=$it)")
         }
 
@@ -36,25 +36,26 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
     }
 
     fun toDocument(vararg tableNames: String): String {
+        val manager = TableManager.createWithDB(dao)
+
         val tables = if (tableNames.isEmpty()) {
-            TableManager.createWithDB(dao).getTables()
+            manager.getTables()
         } else {
-            val t = TableManager.createWithDB(dao)
             tableNames.map {
-                t.getTable(it)!!
+                manager.getTable(it)!!
             }
         }
 
         val result = ArrayList<Record>()
 
         for (table in tables) {
-            result.add(Record(table, Record.LoadMethod.CLEAR_AND_INSERT, loadRecords(table)))
+            result.add(Record(table, Record.LoadMethod.CLEAR_AND_INSERT, loadData(table)))
         }
 
-        return RecordDocumentParser.toDocument(result)
+        return RecordDocuments.toDocument(result)
     }
 
-    private fun loadRecords(table: Table): ArrayList<Record.Data> {
+    private fun loadData(table: Table): ArrayList<Record.Data> {
         val recordData = ArrayList<Record.Data>()
         dao.each(table.name, null) { index, ele, length ->
             val columnData = ArrayList<Record.ColumnData>()

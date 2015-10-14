@@ -29,7 +29,7 @@ class TableManager {
         private val tables: List<Table>
 
         init {
-            tables = TableDocumentParser.parse(document)
+            tables = TableDocuments.parse(document)
         }
 
         override fun getTable(name: String): Table? {

@@ -1,6 +1,6 @@
 package org.asiainfo.test
 
-import com.asiainfo.dbb.record.RecordDocumentParser
+import com.asiainfo.dbb.record.RecordDocuments
 import com.asiainfo.dbb.record.RecordManager
 import com.asiainfo.dbb.table.TableManager
 import com.asiainfo.dbb.table.TableMetaDataLoader
@@ -22,7 +22,7 @@ class RecordManagerTest : IocTest() {
     @Test
     fun toDocument() {
         val tables = TableManager.createWithDocument(Files.read("tables.yml"))
-        println(RecordDocumentParser.toDocument(RecordDocumentParser.parse(Files.read("records.yml")) {
+        println(RecordDocuments.toDocument(RecordDocuments.parse(Files.read("records.yml")) {
             tables.getTable(it)!!
         }))
     }

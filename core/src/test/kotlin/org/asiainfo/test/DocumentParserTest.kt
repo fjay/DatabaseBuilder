@@ -1,7 +1,7 @@
 package org.asiainfo.test
 
-import com.asiainfo.dbb.record.RecordDocumentParser
-import com.asiainfo.dbb.table.TableDocumentParser
+import com.asiainfo.dbb.record.RecordDocuments
+import com.asiainfo.dbb.table.TableDocuments
 import org.junit.Test
 import org.nutz.lang.Files
 
@@ -9,13 +9,13 @@ class DocumentParserTest {
 
     @Test
     fun parseTables() {
-        TableDocumentParser.parse(Files.read("tables.yml"))
+        TableDocuments.parse(Files.read("tables.yml"))
     }
 
     @Test
     fun parseRecords() {
-        val tables = TableDocumentParser.parse(Files.read("tables.yml"))
-        val records = RecordDocumentParser.parse(Files.read("records.yml")) { name ->
+        val tables = TableDocuments.parse(Files.read("tables.yml"))
+        val records = RecordDocuments.parse(Files.read("records.yml")) { name ->
             tables.find { it.name == name }!!
         }
         println(records)
@@ -23,6 +23,6 @@ class DocumentParserTest {
 
     @Test
     fun toTableDocument() {
-        println(TableDocumentParser.toDocument(TableDocumentParser.parse(Files.read("tables.yml"))))
+        println(TableDocuments.toDocument(TableDocuments.parse(Files.read("tables.yml"))))
     }
 }

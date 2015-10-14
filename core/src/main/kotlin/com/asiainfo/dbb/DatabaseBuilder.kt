@@ -2,7 +2,7 @@ package com.asiainfo.dbb
 
 import com.asiainfo.dbb.record.RecordManager
 import com.asiainfo.dbb.table.TableClassBuilder
-import com.asiainfo.dbb.table.TableDocumentParser
+import com.asiainfo.dbb.table.TableDocuments
 import com.asiainfo.dbb.table.TableManager
 import org.nutz.dao.impl.NutDao
 import org.nutz.dao.util.Daos
@@ -73,7 +73,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
     }
 
     fun toTableDocument(): String {
-        return TableDocumentParser.toDocument(TableManager.createWithDB(dao).getTables())
+        return TableDocuments.toDocument(TableManager.createWithDB(dao).getTables())
     }
 
     fun toTableDocument(filePath: String) {
@@ -90,7 +90,7 @@ class DatabaseBuilder(val dataSource: DataSource) {
     fun toRecordDocument(filePath: String) {
         val file = File(filePath)
         Files.deleteFile(file)
-        Files.write(file, toTableDocument())
+        Files.write(file, toRecordDocument())
         log.debugf("Write record document success(file=%s)", filePath)
     }
 }

@@ -12,7 +12,7 @@ import org.nutz.lang.segment.CharSegment
 import org.nutz.lang.stream.StringWriter
 import java.util.*
 
-object RecordDocumentParser {
+object RecordDocuments {
 
     fun parse(text: String, tableProvider: (String) -> Table): List<Record> {
         val result = ArrayList<Record>()
@@ -38,7 +38,7 @@ object RecordDocumentParser {
         for (record in records) {
             val recordInDoc = RecordDocument.Record().apply {
                 table = record.table.name
-                loadMethod = Record.LoadMethod.CLEAR_AND_INSERT.name()
+                loadMethod = record.loadMethod.name()
                 data = "\${$table}"
             }
 

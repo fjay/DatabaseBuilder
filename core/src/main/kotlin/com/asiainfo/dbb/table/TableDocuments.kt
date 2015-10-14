@@ -14,7 +14,7 @@ import org.nutz.lang.stream.StringWriter
 import java.math.BigDecimal
 import java.util.*
 
-object TableDocumentParser {
+object TableDocuments {
 
     fun parse(text: String): List<Table> {
         val result = ArrayList<Table>()
