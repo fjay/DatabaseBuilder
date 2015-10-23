@@ -2,14 +2,14 @@ package com.asiainfo.dbb.command
 
 import com.alibaba.druid.pool.DruidDataSource
 import com.asiainfo.dbb.DatabaseBuilder
-import com.asiainfo.dbb.util.Registrator
+import com.asiainfo.dbb.util.Registrar
 import org.apache.commons.cli.*
 import org.nutz.ioc.impl.PropertiesProxy
 import org.nutz.lang.Strings
 import java.util.*
-import kotlin.properties.get
+import kotlin.properties.getValue
 
-object Commands : Registrator<String, Commands.Command>() {
+object Commands : Registrar<String, Commands.Command>() {
 
     private val HELP_KEY = "h"
 
@@ -61,7 +61,7 @@ object Commands : Registrator<String, Commands.Command>() {
         }
     }
 
-    private abstract class Command(val keyForCommand: String) : Registrator.Applicant<String> {
+    abstract class Command(val keyForCommand: String) : Registrar.Applicant<String> {
 
         abstract val option: Option
 
@@ -72,7 +72,7 @@ object Commands : Registrator<String, Commands.Command>() {
         abstract fun execute(option: Option, context: CommandContext)
     }
 
-    private class CommandContext {
+    class CommandContext {
 
         val map = PropertiesProxy("config/config.properties").let { p ->
             val map = HashMap<String, String>()

@@ -13,18 +13,19 @@ object MysqlAdapter : AbstractDatabaseAdapter() {
     override fun asColType(record: Record): ColType? {
         return when (getTypeNameWithoutUnsigned(record)) {
             "TEXT" -> ColType.TEXT
+            "MEDIUMTEXT" -> ColType.TEXT
+            "LONGTEXT" -> ColType.TEXT
 
             "TINYINT" -> ColType.INT
-
             "BIT" -> ColType.INT
-
             "BIGINT" -> ColType.INT
-
             "MEDIUMINT" -> ColType.INT
 
             "MediumBlob" -> ColType.BINARY
+            "LONGBLOB" -> ColType.BINARY
 
             "DECIMAL" -> ColType.FLOAT
+            "DOUBLE" -> ColType.FLOAT
 
             else -> super.asColType(record)
         }

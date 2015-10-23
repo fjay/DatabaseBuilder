@@ -45,8 +45,8 @@ object DataTableUtil {
 
             for (map in list) {
                 val newMap = LinkedHashMap<String, String>()
-                for (entry in map.entrySet()) {
-                    newMap.put(entry.getKey(), if (entry.getValue() == null) "null" else entry.getValue().toString())
+                for (entry in map.entries) {
+                    newMap.put(entry.key, if (entry.value == null) "null" else entry.value.toString())
                 }
                 result.add(newMap)
             }
@@ -55,7 +55,7 @@ object DataTableUtil {
         }
 
         fun initMaxLength(list: List<MutableMap<String, String>>) {
-            val keys = ArrayList(list.get(0).keySet())
+            val keys = ArrayList(list.get(0).keys)
 
             for (key in keys) {
                 var maxValueLength = length(key)
@@ -109,14 +109,14 @@ object DataTableUtil {
             var first = true
             var totalLength = 0
 
-            for (it in map.keySet()) {
+            for (it in map.keys) {
                 if (it.endsWith(SUFFIX_MAX_LENGTH)) {
                     continue
                 }
 
                 val spilt = if (first) "" else "|"
                 val maxLength = Integer.valueOf(map.get(it + SUFFIX_MAX_LENGTH))!!
-                totalLength += (maxLength + spilt.length())
+                totalLength += (maxLength + spilt.length)
 
                 builder.append(spilt).append(padRight(it, maxLength))
                 first = false
@@ -133,7 +133,7 @@ object DataTableUtil {
             val builder = StringBuilder()
 
             var first = true
-            for (it in map.keySet()) {
+            for (it in map.keys) {
                 if (it.endsWith(SUFFIX_MAX_LENGTH)) {
                     continue
                 }
@@ -158,8 +158,8 @@ object DataTableUtil {
         }
 
         private fun getPadding(padding: String, length: Int): String {
-            if (padding.length() < length) {
-                return multiply(padding, length / padding.length() + 1).substring(0, length)
+            if (padding.length < length) {
+                return multiply(padding, length / padding.length + 1).substring(0, length)
             } else {
                 return padding.substring(0, length)
             }

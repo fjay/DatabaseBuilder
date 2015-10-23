@@ -42,7 +42,7 @@ object RecordDocuments {
 
             val recordInDoc = RecordDocument.Record().apply {
                 table = record.table.name
-                loadMethod = record.loadMethod.name()
+                loadMethod = record.loadMethod.name
                 data = "\${$table}"
             }
 

@@ -90,6 +90,6 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
         }
 
         log.debugf("Insert data success(table=%s,count=%d)",
-                record.table.name, record.data.size())
+                record.table.name, record.data.size)
     }
 }

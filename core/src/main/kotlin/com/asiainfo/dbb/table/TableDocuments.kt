@@ -55,7 +55,7 @@ object TableDocuments {
                 this.indexes = indexes.map { i ->
                     TableDocument.Index().apply {
                         name = i.name
-                        type = i.type.name()
+                        type = i.type.name
                         columns = i.columns
                     }
                 }
@@ -82,11 +82,11 @@ object TableDocuments {
 
                 val indent = "    "
                 linkedMapOf(
-                        indent + TableDocument.ColumnKey.NAME.name() to indent + it.name,
-                        TableDocument.ColumnKey.TYPE.name() to it.type.name(),
-                        TableDocument.ColumnKey.LENGTH.name() to length,
-                        TableDocument.ColumnKey.NULLABLE.name() to it.nullable,
-                        TableDocument.ColumnKey.COMMENT.name() to it.comment
+                        indent + TableDocument.ColumnKey.NAME.name to indent + it.name,
+                        TableDocument.ColumnKey.TYPE.name to it.type.name,
+                        TableDocument.ColumnKey.LENGTH.name to length,
+                        TableDocument.ColumnKey.NULLABLE.name to it.nullable,
+                        TableDocument.ColumnKey.COMMENT.name to it.comment
                 )
             }))
         }
@@ -177,12 +177,12 @@ object TableDocuments {
 
         val lengthPair = lengthString.split(",")
         val width = lengthPair[0].toInt()
-        val precision = if (lengthPair.size() == 2) lengthPair[1].toInt() else null
+        val precision = if (lengthPair.size == 2) lengthPair[1].toInt() else null
         return Pair(width, precision)
     }
 
     private fun Map<String, String>.getProperty(key: TableDocument.ColumnKey): String? {
-        val value = this[key.name()]
+        val value = this[key.name]
 
         if (Strings.isBlank(value)) {
             return null

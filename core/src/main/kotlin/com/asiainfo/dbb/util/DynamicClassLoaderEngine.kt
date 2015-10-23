@@ -118,7 +118,7 @@ object DynamicClassLoaderEngine {
 
         fun loadClass(fullName: String, jco: JavaClassObject): Class<*> {
             val classData = jco.bytes
-            return this.defineClass(fullName, classData, 0, classData.size())
+            return this.defineClass(fullName, classData, 0, classData.size)
         }
     }
 }

@@ -2,7 +2,7 @@ package com.asiainfo.dbb.util
 
 import java.util.*
 
-open class Registrator<K, V : Registrator.Applicant<K>> {
+open class Registrar<K, V : Registrar.Applicant<K>> {
 
     protected val applicants = LinkedHashMap<K, V>()
 
