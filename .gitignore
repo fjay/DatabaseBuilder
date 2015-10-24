@@ -1,7 +1,7 @@
 /bin
 /*.classpath
 /*.project
-/tmp/
+**/tmp/
 /.settings/
 *.DS_Store
 /target
