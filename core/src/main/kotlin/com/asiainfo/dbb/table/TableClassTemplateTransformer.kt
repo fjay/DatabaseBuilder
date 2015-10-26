@@ -23,6 +23,6 @@ object TableClassTemplateTransformer {
     }
 
     @JvmStatic fun format(list: List<String>): String {
-        return "\"" + list.join("\",\"") + "\""
+        return "\"" + list.joinToString("\",\"") + "\""
     }
 }
