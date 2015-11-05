@@ -72,8 +72,8 @@ object TableDocuments {
         ObjectMapper(YAMLFactory()).writeValue(StringWriter(sb), doc)
         val seg = CharSegment(sb.toString().replace("\"", ""));
 
-        tables.forEach { t ->
-            seg.set(t.name, "|\n" + DataTableUtil.format(t.columns.map {
+        tables.forEach { table ->
+            seg.set(table.name, "|\n" + DataTableUtil.format(table.columns.map {
                 val length = if (it.precision == null || it.precision <= 0) {
                     it.width.toString()
                 } else {

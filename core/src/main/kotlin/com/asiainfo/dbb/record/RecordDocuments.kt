@@ -104,7 +104,7 @@ object RecordDocuments {
         }
 
         val result = DataTransformers.execute(value) ?: return null
-        return Castors.create().castTo(result, toClass)
+        return Castors.me().castTo(result, toClass)
     }
 
     private fun Any?.castToString(): String? {
@@ -116,7 +116,7 @@ object RecordDocuments {
             return if (this) "1" else "0"
         }
 
-        return Castors.create().castTo(this, String::class.java)
+        return Castors.me().castToString(this)
     }
 
     private class RecordDocument {
