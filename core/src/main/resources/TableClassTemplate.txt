@@ -5,21 +5,20 @@ import java.math.*;
 import org.nutz.dao.entity.annotation.*;
 
 #macro renderPKAnnotation()
-    #if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1)
-        @PK({${table.getPrimaryKey().getColumns().format().fieldName()}})
-    #end
+#if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1)
+    @PK({${table.getPrimaryKey().getColumns().format().fieldName()}})
+#end
 #end
 
 #macro renderIndexesAnnotation()
-    #if(!table.getIndexes().isEmpty())
-        @TableIndexes({
-        #for(index : table.getIndexes())
-           @Index(name = "${index.getName()}",
-                   fields = {${index.getColumns().format().fieldName()}},
-                   unique = ${index.getType().name().equals("UNIQUE")} #if(!for.last) , #end)
-        #end
-        })
-    #end
+#if(!table.getIndexes().isEmpty())
+@TableIndexes({
+#for(index : table.getIndexes())
+   @Index(name = "${index.getName()}",unique = ${index.getType().name().equals("UNIQUE")} #if(!for.last) , #end,
+           fields = {${index.getColumns().format().fieldName()}})
+#end
+})
+#end
 #end
 
 @Table("${table.name}")
