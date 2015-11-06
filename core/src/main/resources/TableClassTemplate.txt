@@ -14,8 +14,8 @@ import org.nutz.dao.entity.annotation.*;
 #if(!table.getIndexes().isEmpty())
 @TableIndexes({
 #for(index : table.getIndexes())
-   @Index(name = "${index.getName()}",unique = ${index.getType().name().equals("UNIQUE")} #if(!for.last) , #end,
-           fields = {${index.getColumns().format().fieldName()}})
+   @Index(name = "${index.getName()}",unique = ${index.getType().name().equals("UNIQUE")},
+           fields = {${index.getColumns().format().fieldName()}}) #if(!for.last) , #end
 #end
 })
 #end
