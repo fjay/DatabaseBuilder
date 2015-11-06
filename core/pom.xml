@@ -41,9 +41,9 @@
             <version>1.2.17</version>
         </dependency>
         <dependency>
-            <groupId>org.rythmengine</groupId>
-            <artifactId>rythm-engine</artifactId>
-            <version>1.0.1</version>
+            <groupId>com.github.subchen</groupId>
+            <artifactId>jetbrick-template</artifactId>
+            <version>2.0.12</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

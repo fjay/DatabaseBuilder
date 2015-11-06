@@ -2,24 +2,28 @@ package com.asiainfo.dbb.table
 
 import com.asiainfo.dbb.model.Table
 import com.asiainfo.dbb.util.DynamicClassLoaderEngine
+import jetbrick.template.JetEngine
 import org.nutz.lang.Files
 import org.nutz.lang.Strings
 import org.nutz.log.Logs
-import org.rythmengine.RythmEngine
-import org.rythmengine.conf.RythmConfigurationKey
 import java.io.File
+import java.io.StringWriter
 import java.util.*
 
 class TableClassBuilder(val tables: List<Table>) {
 
     private val log = Logs.get()
 
-    private val rythm = RythmEngine(mapOf(RythmConfigurationKey.CODEGEN_COMPACT_ENABLED.key to false))
+    private val engine = JetEngine.create()
 
     private val defaultTemplate = Files.read("TableClassTemplate.txt")
 
     init {
-        rythm.registerTransformer(TableClassTemplateTransformer::class.java)
+        registerTemplateMethod(TableClassTemplateMethod::class.java)
+    }
+
+    fun registerTemplateMethod(method: Class<*>) {
+        engine.globalResolver.registerMethods(method)
     }
 
     fun buildClassesInMemory(tableClassPackage: String): List<Class<*>> {
@@ -43,11 +47,16 @@ class TableClassBuilder(val tables: List<Table>) {
         }
     }
 
-    private fun buildJavaSource(tableClassPackage: String, table: Table, template: String): String {
-        return rythm.render(template, mapOf(
+    private fun buildJavaSource(tableClassPackage: String, table: Table, templateContent: String): String {
+        val template = engine.createTemplate(templateContent)
+
+        val sw = StringWriter()
+        template.render(mapOf(
                 "table" to table,
                 "packageName" to tableClassPackage
-        ))
+        ), sw)
+
+        return sw.toString()
     }
 
     private fun getClassName(tableName: String): String {

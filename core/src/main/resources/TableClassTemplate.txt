@@ -1,73 +1,57 @@
-@args String packageName
-package @packageName;
+package ${packageName};
 
 import java.util.*;
 import java.math.*;
 import org.nutz.dao.entity.annotation.*;
 
-@args com.asiainfo.dbb.model.Table table
+#macro renderPKAnnotation()
+    #if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1)
+        @PK({${table.getPrimaryKey().getColumns().format().fieldName()}})
+    #end
+#end
 
-@def boolean isSinglePKColumn(String columnName) {
-    boolean isSinglePK = table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() == 1;
-    if(isSinglePK) {
-        return table.getPrimaryKey().getColumns().get(0).equals(columnName);
-    }
-    return false;
-}
-
-@def renderPKAnnotation() {
-    @if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1){
-        @@PK({@table.getPrimaryKey().getColumns().app_format().app_fieldName()})
-    }
-}
-
-@def renderIndexesAnnotation() {
-    @if(!table.getIndexes().isEmpty()) {
-        @@TableIndexes({
-        @for(com.asiainfo.dbb.model.Index index : table.getIndexes()) {
-           @@Index(name = "@index.getName()",
-                   fields = {@index.getColumns().app_format().app_fieldName()},
-                   unique = @index.getType().name().equals("UNIQUE")) @if(!index_isLast) { , }
-        }
+#macro renderIndexesAnnotation()
+    #if(!table.getIndexes().isEmpty())
+        @TableIndexes({
+        #for(index : table.getIndexes())
+           @Index(name = "${index.getName()}",
+                   fields = {${index.getColumns().format().fieldName()}},
+                   unique = ${index.getType().name().equals("UNIQUE")} #if(!for.last) , #end
+        #end
         })
-    }
-}
+    #end
+#end
 
-@@Table("@table.getName()")
-@@Comment("@table.getComment()")
-@renderPKAnnotation()
-@renderIndexesAnnotation()
-public class @table.getName().app_methodName() {
+@Table("${table.name}")
+@Comment("${table.comment}")
+#call renderPKAnnotation()
+#call renderIndexesAnnotation()
+public class ${table.name.methodName()} {
 
-@for(com.asiainfo.dbb.model.Column column : table.getColumns()) {
-    @{String columnName = column.getName()}
-    @if(isSinglePKColumn(columnName)) {
-        @{columnName = "id"}
-        @if(column.getJavaType().getSimpleName().equals("String")) {@@Name @@Prev(els = @@EL("uuid(32)"))} else {@@Id}
-    }
-    @@Column("@column.getName()")
-    @@ColDefine(
-        type = ColType.@column.getType()
-        @if(column.getWidth() != null) {,width = @column.getWidth()}
-        @if(column.getPrecision() != null) {,precision = @column.getPrecision()}
-        ,notNull = @if(column.getNullable()) {false} else {true}
+#for(column : table.getColumns())
+    #set(columnName = column.name)
+    #if(column.isSinglePKColumn(table))
+        #set(columnName = "id")
+        #if(column.javaType.name == "java.lang.String") @Name @Prev(els = @EL("uuid(32)")) #else @Id #end
+    #end
+    @Column("${column.name}")
+    @ColDefine(
+        type = ColType.${column.type} #if(column.width) ,width = ${column.width} #end #if(column.precision) ,precision = ${column.precision} #end ,notNull = #if(column.getNullable()) false  #else true #end
     )
-    @@Comment("@column.getComment()")
-    private @column.getJavaType().getSimpleName() @columnName.app_fieldName();
+    @Comment("${column.comment}")
+    private ${column.javaType} ${columnName.fieldName()};
+#end
 
-}
-
-@for(com.asiainfo.dbb.model.Column column : table.getColumns()) {
-    @{ String columnName = column.getName() }
-    @if(isSinglePKColumn(columnName)) {
-        @{columnName = "id"}
+#for(column : table.getColumns())
+    #set(columnName = column.name)
+    #if(column.isSinglePKColumn(table))
+        #set(columnName = "id")
+    #end
+    public ${column.javaType} get${columnName.methodName()} () {
+        return ${columnName.fieldName()};
     }
-    public @column.getJavaType().getSimpleName() get@columnName.app_methodName() () {
-        return @columnName.app_fieldName();
+    public void set${columnName.methodName()} (${column.javaType} obj) {
+        ${columnName.fieldName()} = obj;
     }
-    public void set@columnName.app_methodName() (@column.getJavaType().getSimpleName() obj) {
-        @columnName.app_fieldName() = obj;
-    }
-
-}
+#end
 }
