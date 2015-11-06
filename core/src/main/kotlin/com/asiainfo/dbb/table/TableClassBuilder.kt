@@ -82,7 +82,7 @@ class TableClassBuilder(val tables: List<Table>) {
         val fileName = getClassName(table.name) + ".java"
 
         Files.write(
-                path + fileName,
+                path + File.separator + fileName,
                 source
         )
     }

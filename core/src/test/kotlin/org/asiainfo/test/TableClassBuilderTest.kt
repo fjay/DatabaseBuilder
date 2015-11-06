@@ -11,7 +11,7 @@ class TableClassBuilderTest : IocTest() {
     @Test
     fun buildJavaFile() {
         TableClassBuilder(TableManager.createWithDocument(Files.read("tables.yml")).getTables())
-                .buildJavaFile("com.asiainfo.test.entity", "~/tmp/entity/")
+                .buildJavaFile("com.asiainfo.test.entity", "~/tmp/entity")
     }
 
     @Test
