@@ -31,4 +31,12 @@ object TableClassTemplateMethod {
         val pks = table.primaryKey?.columns
         return Lang.length(pks) == 1 && pks?.first() == column.name
     }
+
+    @JvmStatic fun javaTypeName(column: Column): String {
+        return column.javaType.name
+    }
+
+    @JvmStatic fun javaTypeSimpleName(column: Column): String {
+        return column.javaType.simpleName
+    }
 }
