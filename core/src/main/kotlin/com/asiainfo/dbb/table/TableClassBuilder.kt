@@ -80,10 +80,9 @@ class TableClassBuilder(val tables: List<Table>) {
         val source = buildJavaSource(tableClassPackage, table, template)
 
         val fileName = getClassName(table.name) + ".java"
+        val file = File(path + File.separator + fileName)
+        Files.write(file, source)
 
-        Files.write(
-                path + File.separator + fileName,
-                source
-        )
+        log.info("BuildJavaFile:${file.absolutePath}");
     }
 }
