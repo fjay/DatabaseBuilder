@@ -5,6 +5,7 @@ import com.asiainfo.dbb.DatabaseBuilder
 import com.asiainfo.dbb.util.Registrar
 import org.apache.commons.cli.*
 import org.nutz.ioc.impl.PropertiesProxy
+import org.nutz.lang.Files
 import org.nutz.lang.Strings
 import java.util.*
 import kotlin.properties.getValue
@@ -139,7 +140,7 @@ object Commands : Registrar<String, Commands.Command>() {
                     context.tableFilePath,
                     context.tableClassPackage,
                     context.tableClassPath,
-                    context.tableClassTemplatePath
+                    Files.read(context.tableClassTemplatePath)
             )
         }
     }
