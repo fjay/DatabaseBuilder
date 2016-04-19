@@ -48,7 +48,7 @@ object TableDocuments {
 
                 columns = "\${$name}"
 
-                val indexes = t.indexes.toArrayList()
+                val indexes = t.indexes.toMutableList()
                 if ( t.primaryKey != null) {
                     indexes.add(t.primaryKey)
                 }

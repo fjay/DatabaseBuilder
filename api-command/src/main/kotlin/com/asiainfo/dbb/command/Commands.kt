@@ -8,7 +8,6 @@ import org.nutz.ioc.impl.PropertiesProxy
 import org.nutz.lang.Files
 import org.nutz.lang.Strings
 import java.util.*
-import kotlin.properties.getValue
 
 object Commands : Registrar<String, Commands.Command>() {
 
