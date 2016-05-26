@@ -15,7 +15,7 @@
     <properties>
         <api.command.version>1.0.0</api.command.version>
         <core.version>1.0.0</core.version>
-        <kotlin.version>1.0.1-2</kotlin.version>
+        <kotlin.version>1.0.2</kotlin.version>
     </properties>
 
     <dependencies>
