@@ -139,7 +139,11 @@ object Commands : Registrar<String, Commands.Command>() {
                     context.tableFilePath,
                     context.tableClassPackage,
                     context.tableClassPath,
-                    Files.read(context.tableClassTemplatePath)
+                    if (context.tableClassTemplatePath == null) {
+                        null
+                    } else {
+                        Files.read(context.tableClassTemplatePath)
+                    }
             )
         }
     }

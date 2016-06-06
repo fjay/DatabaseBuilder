@@ -49,7 +49,7 @@ object TableDocuments {
                 columns = "\${$name}"
 
                 val indexes = t.indexes.toMutableList()
-                if ( t.primaryKey != null) {
+                if (t.primaryKey != null) {
                     indexes.add(t.primaryKey)
                 }
                 this.indexes = indexes.map { i ->
@@ -109,7 +109,7 @@ object TableDocuments {
                     precision = precision,
                     type = type,
                     javaType = asJavaType(type),
-                    pk = pk?.name == name,
+                    pk = pk?.columns?.contains(name) == true,
                     nullable = nullable,
                     comment = map.getProperty(TableDocument.ColumnKey.COMMENT)
             ))

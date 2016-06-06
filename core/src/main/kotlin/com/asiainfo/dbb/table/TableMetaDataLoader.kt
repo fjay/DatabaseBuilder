@@ -60,7 +60,7 @@ class TableMetaDataLoader(val dao: Dao) {
                 width = record.getInt("column_size"),
                 precision = record.getInt("decimal_digits"),
                 javaType = TableDocuments.asJavaType(type),
-                pk = pk?.name == name,
+                pk = pk?.columns?.contains(name) == true,
                 nullable = Lang.parseBoolean(record.getString("nullable")),
                 comment = record.getString("remarks")
         )

@@ -8,6 +8,6 @@ class ClientTest : IocTest() {
     @Test
     fun main() {
 //        Client.main(arrayOf("-fd"))
-        Client.main(arrayOf("-ctd"))
+        Client.main(arrayOf("-ctc"))
     }
 }
