@@ -35,17 +35,9 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
         }
     }
 
-    fun toDocument(vararg tableNames: String): String {
+    fun toDocument(tableNames: Array<String>? = null): String {
         val manager = TableManager.createWithDB(dao)
-
-        val tables = if (tableNames.isEmpty()) {
-            manager.getTables()
-        } else {
-            tableNames.map {
-                manager.getTable(it)!!
-            }
-        }
-
+        val tables = manager.getTables(tableNames)
         val result = ArrayList<Record>()
 
         for (table in tables) {

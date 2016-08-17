@@ -20,8 +20,7 @@ class TableManager {
 
         fun getTable(name: String): Table?
 
-        fun getTables(): List<Table>
-
+        fun getTables(tableNames: Array<String>? = null): List<Table>
     }
 
     private class TablesInDocument(val document: String) : Tables {
@@ -36,8 +35,12 @@ class TableManager {
             return tables.find { it.name == name }
         }
 
-        override fun getTables(): List<Table> {
-            return tables
+        override fun getTables(tableNames: Array<String>?): List<Table> {
+            return if (tableNames != null && tableNames.isNotEmpty()) {
+                tables.filter { tableNames.contains(it.name) }
+            } else {
+                tables
+            }
         }
     }
 
@@ -52,8 +55,12 @@ class TableManager {
             }
         }
 
-        override fun getTables(): List<Table> {
-            return TableMetaDataLoader(dao).load()
+        override fun getTables(tableNames: Array<String>?): List<Table> {
+            return if (tableNames != null && tableNames.isNotEmpty()) {
+                TableMetaDataLoader(dao).load(tableNames.joinToString("|"))
+            } else {
+                TableMetaDataLoader(dao).load()
+            }
         }
     }
 }

@@ -7,7 +7,6 @@ class ClientTest : IocTest() {
 
     @Test
     fun main() {
-//        Client.main(arrayOf("-fd"))
-        Client.main(arrayOf("-ctc"))
+        Client.main(arrayOf("-ctd", "my_stock", "my_transaction", "-crd"))
     }
 }

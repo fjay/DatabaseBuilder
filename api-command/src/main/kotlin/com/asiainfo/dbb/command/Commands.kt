@@ -40,6 +40,8 @@ object Commands : Registrar<String, Commands.Command>() {
 
         try {
             val commandLine = DefaultParser().parse(options, args)
+            context.commandLine = commandLine
+
             var hasOption = false
 
             applicants.forEach { entry ->
@@ -78,7 +80,7 @@ object Commands : Registrar<String, Commands.Command>() {
             val map = HashMap<String, String>()
 
             p.keys.forEach {
-                var value = p.get(it)
+                val value = p.get(it)
                 if (!Strings.isBlank(value)) {
                     map[it] = value
                 }
@@ -86,6 +88,8 @@ object Commands : Registrar<String, Commands.Command>() {
 
             map
         }
+
+        lateinit var commandLine: CommandLine
 
         val tableFilePath: String by map
 
@@ -131,13 +135,18 @@ object Commands : Registrar<String, Commands.Command>() {
     private class CreateTableClass : Command("ctc") {
         override val option = Option(keyForCommand, "create-table-class",
                 false, "生成表对应的实体类").apply {
+            setOptionalArg(true)
+//            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
+            val tableNames = context.commandLine.getOptionValues(option.longOpt)
+
             context.builder.value.createTableClassesWithFilePath(
                     context.tableFilePath,
                     context.tableClassPackage,
+                    tableNames,
                     context.tableClassPath,
                     if (context.tableClassTemplatePath == null) {
                         null
@@ -151,11 +160,16 @@ object Commands : Registrar<String, Commands.Command>() {
     private class CreateTable : Command("ct") {
         override val option = Option(keyForCommand, "create-table",
                 false, "生成指定数据库的表结构").apply {
+            setOptionalArg(true)
+//            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
-            context.builder.value.createTablesWithFilePath(context.tableFilePath, context.tableClassPackage)
+            val tableNames = context.commandLine.getOptionValues(option.longOpt)
+            context.builder.value.createTablesWithFilePath(context.tableFilePath,
+                    context.tableClassPackage,
+                    tableNames)
         }
     }
 
@@ -173,22 +187,28 @@ object Commands : Registrar<String, Commands.Command>() {
     private class CreateTableDocument : Command("ctd") {
         override val option = Option(keyForCommand, "create-table-document",
                 false, "反向生成表结构文本结构").apply {
+            setOptionalArg(true)
+//            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
-            context.builder.value.toTableDocument(context.tableDocumentPath)
+            val tableNames = context.commandLine.getOptionValues(option.longOpt)
+            context.builder.value.toTableDocument(tableNames, context.tableDocumentPath)
         }
     }
 
     private class CreateRecordDocument : Command("crd") {
         override val option = Option(keyForCommand, "create-record-document",
                 false, "反向生成数据文本结构").apply {
+            setOptionalArg(true)
+//            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
-            context.builder.value.toRecordDocument(context.recordDocumentPath)
+            val tableNames = context.commandLine.getOptionValues(option.longOpt)
+            context.builder.value.toRecordDocument(tableNames, context.recordDocumentPath)
         }
     }
 }
