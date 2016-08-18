@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.asiainfo.dbb</groupId>
+        <groupId>org.team4u.dbb</groupId>
         <artifactId>database-builder</artifactId>
         <version>1.0.1</version>
     </parent>
@@ -16,7 +16,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.asiainfo.dbb</groupId>
+            <groupId>org.team4u.dbb</groupId>
             <artifactId>database-builder-core</artifactId>
             <version>${parent.version}</version>
         </dependency>

@@ -51,7 +51,7 @@ Maven
 
 ```
 <dependency>
-    <groupId>com.asiainfo.dbb</groupId>
+    <groupId>org.team4u.dbb</groupId>
      <artifactId>database-builder-core</artifactId>
     <version>1.0.1</version>
 </dependency>
