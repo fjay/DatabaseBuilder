@@ -1,13 +1,13 @@
 package org.team4u.dbb
 
-import org.team4u.dbb.record.RecordManager
-import org.team4u.dbb.table.TableClassBuilder
-import org.team4u.dbb.table.TableDocuments
-import org.team4u.dbb.table.TableManager
 import org.nutz.dao.impl.NutDao
 import org.nutz.dao.util.Daos
 import org.nutz.lang.Files
 import org.nutz.log.Logs
+import org.team4u.dbb.record.RecordManager
+import org.team4u.dbb.table.TableClassBuilder
+import org.team4u.dbb.table.TableDocuments
+import org.team4u.dbb.table.TableManager
 import java.io.File
 import javax.sql.DataSource
 
@@ -17,15 +17,15 @@ class DatabaseBuilder(dataSource: DataSource) {
 
     private val dao = NutDao(dataSource)
 
-    fun createTablesWithFile(file: File, packageName: String, tableNames: Array<String>? = null) {
+    fun createTablesWithFile(file: File, packageName: String, tableNames: List<String>? = null) {
         createTablesWithContent(Files.read(file), packageName, tableNames)
     }
 
-    fun createTablesWithFilePath(filePath: String, packageName: String, tableNames: Array<String>? = null) {
+    fun createTablesWithFilePath(filePath: String, packageName: String, tableNames: List<String>? = null) {
         createTablesWithFile(Files.findFile(filePath), packageName, tableNames)
     }
 
-    fun createTablesWithContent(content: String, packageName: String, tableNames: Array<String>? = null) {
+    fun createTablesWithContent(content: String, packageName: String, tableNames: List<String>? = null) {
         val tables = TableManager.createWithDocument(content).getTables().filter {
             tableNames == null || tableNames.isEmpty() || tableNames.contains(it.name)
         }
@@ -38,7 +38,7 @@ class DatabaseBuilder(dataSource: DataSource) {
 
     fun createTableClassesWithFile(file: File,
                                    packageName: String,
-                                   tableNames: Array<String>? = null,
+                                   tableNames: List<String>? = null,
                                    tableClassPath: String,
                                    template: String? = null,
                                    fileExtension: String) {
@@ -48,7 +48,7 @@ class DatabaseBuilder(dataSource: DataSource) {
 
     fun createTableClassesWithFilePath(filePath: String,
                                        packageName: String,
-                                       tableNames: Array<String>? = null,
+                                       tableNames: List<String>? = null,
                                        tableClassPath: String,
                                        template: String? = null,
                                        fileExtension: String) {
@@ -58,7 +58,7 @@ class DatabaseBuilder(dataSource: DataSource) {
 
     fun createTableClassesWithContent(content: String,
                                       packageName: String,
-                                      tableNames: Array<String>? = null,
+                                      tableNames: List<String>? = null,
                                       tableClassPath: String,
                                       template: String? = null,
                                       fileExtension: String) {
@@ -84,22 +84,22 @@ class DatabaseBuilder(dataSource: DataSource) {
         RecordManager(dao, TableManager.createWithDB(dao)).fillData(content)
     }
 
-    fun toTableDocument(tableNames: Array<String>? = null): String {
+    fun toTableDocument(tableNames: List<String>? = null): String {
         return TableDocuments.toDocument(TableManager.createWithDB(dao).getTables(tableNames))
     }
 
-    fun toTableDocument(tableNames: Array<String>? = null, filePath: String) {
+    fun toTableDocument(tableNames: List<String>? = null, filePath: String) {
         val file = File(filePath)
         Files.deleteFile(file)
         Files.write(file, toTableDocument(tableNames))
         log.debugf("Write table document success(file=%s)", filePath)
     }
 
-    fun toRecordDocument(tableNames: Array<String>? = null): String {
+    fun toRecordDocument(tableNames: List<String>? = null): String {
         return RecordManager(dao, TableManager.createWithDB(dao)).toDocument(tableNames)
     }
 
-    fun toRecordDocument(tableNames: Array<String>? = null, filePath: String) {
+    fun toRecordDocument(tableNames: List<String>? = null, filePath: String) {
         val file = File(filePath)
         Files.deleteFile(file)
         Files.write(file, toRecordDocument(tableNames))

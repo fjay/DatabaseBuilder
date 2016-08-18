@@ -3,6 +3,7 @@ package ${packageName};
 import java.util.*;
 import java.math.*;
 import org.nutz.dao.entity.annotation.*;
+import com.asiainfo.common.nutz.dao.BaseEntity;
 
 #macro renderPKAnnotation()
 #if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1)
@@ -25,7 +26,7 @@ import org.nutz.dao.entity.annotation.*;
 @Comment("${table.comment}")
 #call renderPKAnnotation()
 #call renderIndexesAnnotation()
-public class ${table.name.methodName()} {
+public class ${table.name.methodName()} implements BaseEntity {
 #for(column : table.getColumns())
     #set(columnName = column.name)
     #if(column.isSinglePKColumn(table))

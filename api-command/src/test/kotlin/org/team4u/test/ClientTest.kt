@@ -1,12 +1,12 @@
 package org.team4u.test
 
-import org.team4u.dbb.command.Client
 import org.junit.Test
+import org.team4u.dbb.command.Client
 
 class ClientTest : IocTest() {
 
     @Test
     fun main() {
-        Client.main(arrayOf("-ctc","-h"))
+        Client.main(arrayOf("-ct", "TEST, TEST2", "-ctc", "TEST"))
     }
 }

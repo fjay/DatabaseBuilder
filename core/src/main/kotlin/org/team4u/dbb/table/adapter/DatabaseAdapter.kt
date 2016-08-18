@@ -1,6 +1,6 @@
 package org.team4u.dbb.table.adapter
 
-import org.team4u.dbb.util.Registrar
+import com.asiainfo.common.util.Registrar
 import org.nutz.dao.DB
 import org.nutz.dao.entity.Record
 import org.nutz.dao.entity.annotation.ColType

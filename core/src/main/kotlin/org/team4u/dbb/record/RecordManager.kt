@@ -35,7 +35,7 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
         }
     }
 
-    fun toDocument(tableNames: Array<String>? = null): String {
+    fun toDocument(tableNames: List<String>? = null): String {
         val manager = TableManager.createWithDB(dao)
         val tables = manager.getTables(tableNames)
         val result = ArrayList<Record>()

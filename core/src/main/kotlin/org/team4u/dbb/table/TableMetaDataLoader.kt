@@ -1,12 +1,12 @@
 package org.team4u.dbb.table
 
+import org.nutz.dao.Dao
+import org.nutz.lang.Lang
 import org.team4u.dbb.model.Column
 import org.team4u.dbb.model.Index
 import org.team4u.dbb.model.Table
 import org.team4u.dbb.table.adapter.DatabaseAdapters
 import org.team4u.dbb.util.DaoUtil
-import org.nutz.dao.Dao
-import org.nutz.lang.Lang
 import java.sql.Connection
 import java.sql.DatabaseMetaData
 import java.sql.ResultSet
@@ -14,7 +14,7 @@ import java.util.*
 
 class TableMetaDataLoader(val dao: Dao) {
 
-    private val adapter = DatabaseAdapters[dao.meta().type] ?: throw RuntimeException("Unsupported database")
+    private val adapter = DatabaseAdapters.get(dao.meta().type) ?: throw RuntimeException("Unsupported database")
 
     fun load(tableNamePattern: String = "%"): List<Table> {
         val tables = ArrayList<Table>()

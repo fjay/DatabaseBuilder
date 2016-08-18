@@ -1,11 +1,11 @@
 package org.team4u.dbb.table
 
-import org.team4u.dbb.model.Table
-import org.team4u.dbb.util.DynamicClassLoaderEngine
 import jetbrick.template.JetEngine
 import org.nutz.lang.Files
 import org.nutz.lang.Strings
 import org.nutz.log.Logs
+import org.team4u.dbb.model.Table
+import org.team4u.dbb.util.DynamicClassLoaderEngine
 import java.io.File
 import java.io.StringWriter
 import java.util.*
@@ -42,7 +42,7 @@ class TableClassBuilder(val tables: List<Table>) {
                       template: String? = null, fileExtension: String) {
         Files.deleteDir(File(path))
         tables.forEach {
-            buildJavaFile(tableClassPackage, it, path, template ?: Companion.DEFAULT_TEMPLATE, fileExtension)
+            buildJavaFile(tableClassPackage, it, path, template ?: Companion.TABLE_CLASS_TEMPLATE, fileExtension)
         }
     }
 
@@ -63,7 +63,7 @@ class TableClassBuilder(val tables: List<Table>) {
     }
 
     private fun buildClassInMemory(tableClassPackage: String, table: Table): Class<*>? {
-        val source = buildJavaSource(tableClassPackage, table, Companion.DEFAULT_TEMPLATE)
+        val source = buildJavaSource(tableClassPackage, table, Companion.TABLE_CLASS_TEMPLATE)
 
         val clazz = DynamicClassLoaderEngine.loadClassFromSource(tableClassPackage + "." + getClassName(table.name), source)
         if (clazz == null) {
@@ -88,6 +88,6 @@ class TableClassBuilder(val tables: List<Table>) {
     }
 
     companion object {
-        private val DEFAULT_TEMPLATE = Files.read("TableClassTemplate.txt")
+        private val TABLE_CLASS_TEMPLATE = Files.read("TableClassTemplate.txt")
     }
 }

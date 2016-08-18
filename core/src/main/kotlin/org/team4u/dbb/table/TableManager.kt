@@ -1,7 +1,7 @@
 package org.team4u.dbb.table
 
-import org.team4u.dbb.model.Table
 import org.nutz.dao.Dao
+import org.team4u.dbb.model.Table
 
 class TableManager {
 
@@ -20,7 +20,7 @@ class TableManager {
 
         fun getTable(name: String): Table?
 
-        fun getTables(tableNames: Array<String>? = null): List<Table>
+        fun getTables(tableNames: List<String>? = null): List<Table>
     }
 
     private class TablesInDocument(val document: String) : Tables {
@@ -35,7 +35,7 @@ class TableManager {
             return tables.find { it.name == name }
         }
 
-        override fun getTables(tableNames: Array<String>?): List<Table> {
+        override fun getTables(tableNames: List<String>?): List<Table> {
             return if (tableNames != null && tableNames.isNotEmpty()) {
                 tables.filter { tableNames.contains(it.name) }
             } else {
@@ -55,7 +55,7 @@ class TableManager {
             }
         }
 
-        override fun getTables(tableNames: Array<String>?): List<Table> {
+        override fun getTables(tableNames: List<String>?): List<Table> {
             return if (tableNames != null && tableNames.isNotEmpty()) {
                 TableMetaDataLoader(dao).load(tableNames.joinToString("|"))
             } else {
