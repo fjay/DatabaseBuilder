@@ -19,7 +19,11 @@ class DatabaseBuilderTest : IocTest() {
 
     @Test
     fun createTableClassesWithFilePath() {
-        databaseBuilder().createTableClassesWithFilePath("tables.yml", "org.asiainfo.test.entity", "")
+        databaseBuilder().createTableClassesWithFilePath(
+                filePath = "tables.yml",
+                packageName = "org.asiainfo.test.entity",
+                tableClassPath = "./tmp/entity",
+                fileExtension = "java")
     }
 
     @Test

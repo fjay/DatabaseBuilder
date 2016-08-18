@@ -16,8 +16,6 @@ class TableClassBuilder(val tables: List<Table>) {
 
     private val engine = JetEngine.create()
 
-    private val defaultTemplate = Files.read("TableClassTemplate.txt")
-
     init {
         registerTemplateMethod(TableClassTemplateMethod::class.java)
     }
@@ -40,10 +38,11 @@ class TableClassBuilder(val tables: List<Table>) {
         return classes
     }
 
-    fun buildJavaFile(tableClassPackage: String, path: String, template: String? = null) {
+    fun buildJavaFile(tableClassPackage: String, path: String,
+                      template: String? = null, fileExtension: String) {
         Files.deleteDir(File(path))
         tables.forEach {
-            buildJavaFile(tableClassPackage, it, path, template ?: defaultTemplate)
+            buildJavaFile(tableClassPackage, it, path, template ?: Companion.DEFAULT_TEMPLATE, fileExtension)
         }
     }
 
@@ -64,7 +63,7 @@ class TableClassBuilder(val tables: List<Table>) {
     }
 
     private fun buildClassInMemory(tableClassPackage: String, table: Table): Class<*>? {
-        val source = buildJavaSource(tableClassPackage, table, defaultTemplate)
+        val source = buildJavaSource(tableClassPackage, table, Companion.DEFAULT_TEMPLATE)
 
         val clazz = DynamicClassLoaderEngine.loadClassFromSource(tableClassPackage + "." + getClassName(table.name), source)
         if (clazz == null) {
@@ -76,13 +75,19 @@ class TableClassBuilder(val tables: List<Table>) {
         return clazz
     }
 
-    private fun buildJavaFile(tableClassPackage: String, table: Table, path: String, template: String) {
+    private fun buildJavaFile(tableClassPackage: String, table: Table,
+                              path: String, template: String,
+                              fileExtension: String) {
         val source = buildJavaSource(tableClassPackage, table, template)
 
-        val fileName = getClassName(table.name) + ".java"
+        val fileName = getClassName(table.name) + "." + fileExtension
         val file = File(path + File.separator + fileName)
         Files.write(file, source)
 
         log.info("BuildJavaFile:${file.absolutePath}");
+    }
+
+    companion object {
+        private val DEFAULT_TEMPLATE = Files.read("TableClassTemplate.txt")
     }
 }

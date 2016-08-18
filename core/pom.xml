@@ -7,23 +7,28 @@
     <parent>
         <groupId>com.asiainfo.dbb</groupId>
         <artifactId>database-builder</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <artifactId>database-builder-core</artifactId>
-    <version>${core.version}</version>
+    <version>${parent.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>com.asiainfo</groupId>
-            <artifactId>common</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.asiainfo.common</groupId>
+            <artifactId>asiainfo-util</artifactId>
+            <version>1.0.35</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutz</artifactId>
+            <version>1.r.57</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>

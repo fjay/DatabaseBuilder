@@ -11,21 +11,21 @@ import org.nutz.log.Logs
 import java.io.File
 import javax.sql.DataSource
 
-class DatabaseBuilder(val dataSource: DataSource) {
+class DatabaseBuilder(dataSource: DataSource) {
 
     private val log = Logs.get()
 
     private val dao = NutDao(dataSource)
 
-    fun createTablesWithFile(file: File, packageName: String, tableNames: Array<String>?) {
+    fun createTablesWithFile(file: File, packageName: String, tableNames: Array<String>? = null) {
         createTablesWithContent(Files.read(file), packageName, tableNames)
     }
 
-    fun createTablesWithFilePath(filePath: String, packageName: String, tableNames: Array<String>?) {
+    fun createTablesWithFilePath(filePath: String, packageName: String, tableNames: Array<String>? = null) {
         createTablesWithFile(Files.findFile(filePath), packageName, tableNames)
     }
 
-    fun createTablesWithContent(content: String, packageName: String, tableNames: Array<String>?) {
+    fun createTablesWithContent(content: String, packageName: String, tableNames: Array<String>? = null) {
         val tables = TableManager.createWithDocument(content).getTables().filter {
             tableNames == null || tableNames.isEmpty() || tableNames.contains(it.name)
         }
@@ -38,29 +38,34 @@ class DatabaseBuilder(val dataSource: DataSource) {
 
     fun createTableClassesWithFile(file: File,
                                    packageName: String,
-                                   tableNames: Array<String>?,
+                                   tableNames: Array<String>? = null,
                                    tableClassPath: String,
-                                   template: String? = null) {
-        createTableClassesWithContent(Files.read(file), packageName, tableNames, tableClassPath, template)
+                                   template: String? = null,
+                                   fileExtension: String) {
+        createTableClassesWithContent(Files.read(file), packageName, tableNames,
+                tableClassPath, template, fileExtension)
     }
 
     fun createTableClassesWithFilePath(filePath: String,
                                        packageName: String,
-                                       tableNames: Array<String>?,
+                                       tableNames: Array<String>? = null,
                                        tableClassPath: String,
-                                       template: String? = null) {
-        createTableClassesWithContent(Files.read(filePath), packageName, tableNames, tableClassPath, template)
+                                       template: String? = null,
+                                       fileExtension: String) {
+        createTableClassesWithContent(Files.read(filePath), packageName, tableNames,
+                tableClassPath, template, fileExtension)
     }
 
     fun createTableClassesWithContent(content: String,
                                       packageName: String,
-                                      tableNames: Array<String>?,
+                                      tableNames: Array<String>? = null,
                                       tableClassPath: String,
-                                      template: String? = null) {
+                                      template: String? = null,
+                                      fileExtension: String) {
         val tables = TableManager.createWithDocument(content).getTables().filter {
             tableNames == null || tableNames.isEmpty() || tableNames.contains(it.name)
         }
-        TableClassBuilder(tables).buildJavaFile(packageName, tableClassPath, template)
+        TableClassBuilder(tables).buildJavaFile(packageName, tableClassPath, template, fileExtension)
     }
 
     fun createTablesInPackage(packageName: String, dropIfExist: Boolean) {

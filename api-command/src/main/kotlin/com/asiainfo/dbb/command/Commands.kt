@@ -1,13 +1,12 @@
 package com.asiainfo.dbb.command
 
 import com.alibaba.druid.pool.DruidDataSource
+import com.asiainfo.common.util.StringUtil
+import com.asiainfo.common.util.config.Configs
 import com.asiainfo.dbb.DatabaseBuilder
 import com.asiainfo.dbb.util.Registrar
 import org.apache.commons.cli.*
-import org.nutz.ioc.impl.PropertiesProxy
 import org.nutz.lang.Files
-import org.nutz.lang.Strings
-import java.util.*
 
 object Commands : Registrar<String, Commands.Command>() {
 
@@ -17,6 +16,7 @@ object Commands : Registrar<String, Commands.Command>() {
 
     init {
         register(Help())
+        register(WithConfig())
         register(CreateTableClass())
         register(CreateTable())
         register(FillData())
@@ -76,40 +76,22 @@ object Commands : Registrar<String, Commands.Command>() {
 
     class CommandContext {
 
-        val map = PropertiesProxy("config/config.properties").let { p ->
-            val map = HashMap<String, String>()
-
-            p.keys.forEach {
-                val value = p.get(it)
-                if (!Strings.isBlank(value)) {
-                    map[it] = value
-                }
-            }
-
-            map
-        }
+        var configPath = "config/config.properties"
 
         lateinit var commandLine: CommandLine
 
-        val tableFilePath: String by map
+        val config: Config by lazy {
+            Configs.getInstance().getOrLoadWithFilePath(
+                    Config::class.java,
+                    configPath
+            )
+        }
 
-        val tableClassPackage: String  by map
-
-        val tableClassPath: String by map
-
-        val tableClassTemplatePath = map["tableClassTemplatePath"]
-
-        val recordFilePath: String  by map
-
-        val tableDocumentPath: String by map
-
-        val recordDocumentPath: String by map
-
-        var builder = lazy {
+        val builder by lazy {
             val dataSource = DruidDataSource().apply {
-                url = map["jdbc.url"]
-                username = map["jdbc.username"]
-                password = map["jdbc.password"]
+                url = config.jdbc.url
+                username = config.jdbc.username
+                password = config.jdbc.password
                 isTestWhileIdle = false
             }
 
@@ -136,23 +118,24 @@ object Commands : Registrar<String, Commands.Command>() {
         override val option = Option(keyForCommand, "create-table-class",
                 false, "生成表对应的实体类").apply {
             setOptionalArg(true)
-//            args = Option.UNLIMITED_VALUES
+            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
             val tableNames = context.commandLine.getOptionValues(option.longOpt)
 
-            context.builder.value.createTableClassesWithFilePath(
-                    context.tableFilePath,
-                    context.tableClassPackage,
+            context.builder.createTableClassesWithFilePath(
+                    context.config.tableFilePath,
+                    context.config.tableClassPackage,
                     tableNames,
-                    context.tableClassPath,
-                    if (context.tableClassTemplatePath == null) {
+                    context.config.tableClassPath,
+                    if (StringUtil.isEmpty(context.config.tableClassTemplatePath)) {
                         null
                     } else {
-                        Files.read(context.tableClassTemplatePath)
-                    }
+                        Files.read(context.config.tableClassTemplatePath)
+                    },
+                    context.config.tableClassFileExtension
             )
         }
     }
@@ -161,14 +144,14 @@ object Commands : Registrar<String, Commands.Command>() {
         override val option = Option(keyForCommand, "create-table",
                 false, "生成指定数据库的表结构").apply {
             setOptionalArg(true)
-//            args = Option.UNLIMITED_VALUES
+            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
             val tableNames = context.commandLine.getOptionValues(option.longOpt)
-            context.builder.value.createTablesWithFilePath(context.tableFilePath,
-                    context.tableClassPackage,
+            context.builder.createTablesWithFilePath(context.config.tableFilePath,
+                    context.config.tableClassPackage,
                     tableNames)
         }
     }
@@ -180,7 +163,7 @@ object Commands : Registrar<String, Commands.Command>() {
         }
 
         override fun execute(option: Option, context: CommandContext) {
-            context.builder.value.fillDataWithFilePath(context.recordFilePath)
+            context.builder.fillDataWithFilePath(context.config.recordFilePath)
         }
     }
 
@@ -188,13 +171,13 @@ object Commands : Registrar<String, Commands.Command>() {
         override val option = Option(keyForCommand, "create-table-document",
                 false, "反向生成表结构文本结构").apply {
             setOptionalArg(true)
-//            args = Option.UNLIMITED_VALUES
+            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
             val tableNames = context.commandLine.getOptionValues(option.longOpt)
-            context.builder.value.toTableDocument(tableNames, context.tableDocumentPath)
+            context.builder.toTableDocument(tableNames, context.config.tableDocumentPath)
         }
     }
 
@@ -202,13 +185,23 @@ object Commands : Registrar<String, Commands.Command>() {
         override val option = Option(keyForCommand, "create-record-document",
                 false, "反向生成数据文本结构").apply {
             setOptionalArg(true)
-//            args = Option.UNLIMITED_VALUES
+            args = Option.UNLIMITED_VALUES
             isRequired = false
         }
 
         override fun execute(option: Option, context: CommandContext) {
             val tableNames = context.commandLine.getOptionValues(option.longOpt)
-            context.builder.value.toRecordDocument(tableNames, context.recordDocumentPath)
+            context.builder.toRecordDocument(tableNames, context.config.recordDocumentPath)
+        }
+    }
+
+    private class WithConfig : Command("c") {
+        override val option = Option(keyForCommand, "config", true, "指定配置文件").apply {
+            isRequired = false
+        }
+
+        override fun execute(option: Option, context: CommandContext) {
+            context.configPath = context.commandLine.getOptionValue(option.longOpt)
         }
     }
 }

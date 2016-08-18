@@ -53,7 +53,7 @@ Maven
 <dependency>
     <groupId>com.asiainfo.dbb</groupId>
      <artifactId>database-builder-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -133,13 +133,14 @@ Linux:
 支持参数:
 
 ```
-usage: dbb [-crd] [-ct] [-ctc] [-ctd] [-fd] [-h]
- -ct,--create-table              生成指定数据库的表结构
- -fd,--fill-data                 生成指定表的数据记录
- -ctc,--create-table-class       生成表对应的实体类
- -crd,--create-record-document   反向生成数据文本结构
- -ctd,--create-table-document    反向生成表结构文本结构
- -h,--help                       帮助说明
+usage: dbb [-c <arg>] [-crd <arg>] [-ct <arg>] [-ctc <arg>] [-ctd <arg>] [-fd] [-h]
+ -c,--config <arg>                     指定配置文件
+ -crd,--create-record-document <arg>   反向生成数据文本结构
+ -ct,--create-table <arg>              生成指定数据库的表结构
+ -ctc,--create-table-class <arg>       生成表对应的实体类
+ -ctd,--create-table-document <arg>    反向生成表结构文本结构
+ -fd,--fill-data                       生成指定表的数据记录
+ -h,--help                             帮助说明                   帮助说明
 ```
 
 ### 文本结构
