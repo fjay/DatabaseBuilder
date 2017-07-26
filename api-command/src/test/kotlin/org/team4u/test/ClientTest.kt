@@ -3,7 +3,7 @@ package org.team4u.test
 import org.junit.Test
 import org.team4u.dbb.command.Client
 
-class ClientTest : IocTest() {
+class ClientTest {
 
     @Test
     fun main() {

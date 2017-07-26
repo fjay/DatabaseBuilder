@@ -1,9 +1,9 @@
 package org.team4u.test
 
-import org.team4u.dbb.util.DynamicClassLoaderEngine
 import org.junit.Test
+import org.team4u.dbb.util.DynamicClassLoaderEngine
 
-class DynamicClassLoaderEngineTest : IocTest() {
+class DynamicClassLoaderEngineTest {
 
     @Test
     fun load() {

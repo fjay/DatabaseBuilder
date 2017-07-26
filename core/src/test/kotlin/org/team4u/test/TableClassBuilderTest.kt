@@ -1,12 +1,12 @@
 package org.team4u.test
 
+import org.junit.Test
+import org.nutz.lang.Files
 import org.team4u.dbb.table.TableClassBuilder
 import org.team4u.dbb.table.TableDocuments
 import org.team4u.dbb.table.TableManager
-import org.junit.Test
-import org.nutz.lang.Files
 
-class TableClassBuilderTest : IocTest() {
+class TableClassBuilderTest {
 
     @Test
     fun buildJavaFile() {
@@ -20,6 +20,6 @@ class TableClassBuilderTest : IocTest() {
 
     @Test
     fun toTableDocument() {
-        println(TableDocuments.toDocument(TableManager.createWithDB(dao()).getTables()))
+        println(TableDocuments.toDocument(TableManager.createWithDB(TestUtil.dao).getTables()))
     }
 }

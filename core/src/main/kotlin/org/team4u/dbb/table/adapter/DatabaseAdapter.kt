@@ -7,7 +7,7 @@ import org.nutz.dao.entity.annotation.ColType
 
 interface DatabaseAdapter : Registrar.Applicant<DB> {
 
-    fun getTypeName(record: Record) = record.getString("type_name")
+    fun getTypeName(record: Record): String = record.getString("type_name")
 
     fun getTypeNameWithoutUnsigned(record: Record) = getTypeName(record).replace(" UNSIGNED", "")
 

@@ -1,12 +1,12 @@
 package org.team4u.test
 
-import org.team4u.dbb.DatabaseBuilder
 import org.junit.Test
+import org.team4u.dbb.DatabaseBuilder
 
-class DatabaseBuilderTest : IocTest() {
+class DatabaseBuilderTest {
 
     private fun databaseBuilder(): DatabaseBuilder {
-        return DatabaseBuilder(dataSource())
+        return DatabaseBuilder(TestUtil.datasource)
     }
 
     @Test

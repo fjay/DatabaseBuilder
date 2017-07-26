@@ -1,22 +1,22 @@
 package org.team4u.test
 
+import org.junit.Test
+import org.nutz.lang.Files
 import org.team4u.dbb.record.RecordDocuments
 import org.team4u.dbb.record.RecordManager
 import org.team4u.dbb.table.TableManager
 import org.team4u.dbb.table.TableMetaDataLoader
-import org.junit.Test
-import org.nutz.lang.Files
 
-class RecordManagerTest : IocTest() {
+class RecordManagerTest {
 
     @Test
     fun insert() {
-        RecordManager(dao(), TableManager.Companion.createWithDB(dao())).fillData(Files.read("records.yml"))
+        RecordManager(TestUtil.dao, TableManager.createWithDB(TestUtil.dao)).fillData(Files.read("records.yml"))
     }
 
     @Test
     fun loadMetaData() {
-        println(TableMetaDataLoader(dao()).load())
+        println(TableMetaDataLoader(TestUtil.dao).load())
     }
 
     @Test
