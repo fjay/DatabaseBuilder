@@ -1,11 +1,11 @@
 package org.team4u.dbb.table.adapter
 
-import com.asiainfo.common.util.Registrar
 import org.nutz.dao.DB
 import org.nutz.dao.entity.Record
 import org.nutz.dao.entity.annotation.ColType
+import org.team4u.kit.core.lang.Registry
 
-interface DatabaseAdapter : Registrar.Applicant<DB> {
+interface DatabaseAdapter : Registry.Applicant<DB> {
 
     fun getTypeName(record: Record): String = record.getString("type_name")
 

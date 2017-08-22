@@ -1,7 +1,7 @@
 package org.team4u.dbb.table
 
+import org.apache.ddlutils.model.Table
 import org.nutz.dao.Dao
-import org.team4u.dbb.model.Table
 
 class TableManager {
 

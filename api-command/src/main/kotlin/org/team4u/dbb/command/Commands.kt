@@ -1,14 +1,14 @@
 package org.team4u.dbb.command
 
 import com.alibaba.druid.pool.DruidDataSource
-import com.asiainfo.common.util.Registrar
-import com.asiainfo.common.util.StringUtil
-import com.asiainfo.common.util.config.Configs
+import com.xiaoleilu.hutool.util.StrUtil
 import org.apache.commons.cli.*
 import org.nutz.lang.Files
 import org.team4u.dbb.DatabaseBuilder
+import org.team4u.kit.core.config.Configurer
+import org.team4u.kit.core.lang.Registry
 
-object Commands : Registrar<String, Commands.Command>() {
+object Commands : Registry<String, Commands.Command>() {
 
     private val HELP_KEY = "h"
 
@@ -24,7 +24,7 @@ object Commands : Registrar<String, Commands.Command>() {
         register(CreateRecordDocument())
     }
 
-    override fun register(value: Command): Registrar<String, Command>? {
+    override fun register(value: Command): Registry<String, Command>? {
         options.addOption(value.option)
         return super.register(value)
     }
@@ -62,7 +62,7 @@ object Commands : Registrar<String, Commands.Command>() {
         }
     }
 
-    abstract class Command(val keyForCommand: String) : Registrar.Applicant<String> {
+    abstract class Command(val keyForCommand: String) : Registry.Applicant<String> {
 
         abstract val option: Option
 
@@ -86,7 +86,7 @@ object Commands : Registrar<String, Commands.Command>() {
         lateinit var commandLine: CommandLine
 
         val config: Config by lazy {
-            Configs.getInstance().getOrLoadWithFilePath(
+            Configurer.getInstance().getOrLoadWithFilePath(
                     Config::class.java,
                     configPath
             )
@@ -134,7 +134,7 @@ object Commands : Registrar<String, Commands.Command>() {
                     context.config.tableClassPackage,
                     getOptionValues(context),
                     context.config.tableClassPath,
-                    if (StringUtil.isEmpty(context.config.tableClassTemplatePath)) {
+                    if (StrUtil.isEmpty(context.config.tableClassTemplatePath)) {
                         null
                     } else {
                         Files.read(context.config.tableClassTemplatePath)

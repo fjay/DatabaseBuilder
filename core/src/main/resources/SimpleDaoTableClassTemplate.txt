@@ -1,0 +1,53 @@
+package ${packageName};
+
+import java.util.*;
+import java.math.*;
+import org.nutz.dao.entity.annotation.*;
+
+#macro renderPKAnnotation()
+#if(table.getPrimaryKey() != null && table.getPrimaryKey().getColumns().size() > 1)
+    @PK({${table.getPrimaryKey().getColumns().format().fieldName()}})
+#end
+#end
+
+#macro renderIndexesAnnotation()
+#if(!table.getIndexes().isEmpty())
+@TableIndexes({
+#for(index : table.getIndexes())
+   @Index(name = "${index.getName()}",unique = ${index.getType().name().equals("UNIQUE")},
+           fields = {${index.getColumns().format().fieldName()}}) #if(!for.last) , #end
+#end
+})
+#end
+#end
+
+@Table("${table.name}")
+@Comment("${table.comment}")
+#call renderPKAnnotation()
+#call renderIndexesAnnotation()
+public class ${table.name.methodName()} {
+#for(column : table.getColumns())
+    #set(columnName = column.name)
+    #if(column.isSinglePKColumn(table))
+        #set(columnName = "id")
+        #if(column.javaTypeName() == "java.lang.String") @Name @Prev(els = @EL("uuid(32)")) #else @Id #end
+    #end
+    @Column("${column.name}")
+    @ColDefine(type = ColType.${column.type} #if(column.width) ,width = ${column.width} #end #if(column.precision) ,precision = ${column.precision} #end ,notNull = #if(column.getNullable()) false  #else true #end)
+    @Comment("${column.comment}")
+    private ${column.javaTypeSimpleName()} ${columnName.fieldName()};
+#end
+
+#for(column : table.getColumns())
+    #set(columnName = column.name)
+    #if(column.isSinglePKColumn(table))
+        #set(columnName = "id")
+    #end
+    public ${column.javaTypeSimpleName()} get${columnName.methodName()} () {
+        return ${columnName.fieldName()};
+    }
+    public void set${columnName.methodName()} (${column.javaTypeSimpleName()} obj) {
+        ${columnName.fieldName()} = obj;
+    }
+#end
+}

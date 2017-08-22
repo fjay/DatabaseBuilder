@@ -1,9 +1,9 @@
 package org.team4u.dbb.table.adapter
 
-import com.asiainfo.common.util.Registrar
 import org.nutz.dao.DB
+import org.team4u.kit.core.lang.Registry
 
-object DatabaseAdapters : Registrar<DB, DatabaseAdapter>() {
+object DatabaseAdapters : Registry<DB, DatabaseAdapter>() {
 
     init {
         register(MysqlAdapter)

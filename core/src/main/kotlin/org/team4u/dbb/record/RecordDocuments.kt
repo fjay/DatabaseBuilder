@@ -1,15 +1,15 @@
 package org.team4u.dbb.record
 
-import org.team4u.dbb.model.Record
-import org.team4u.dbb.model.Table
-import org.team4u.dbb.record.transformer.DataTransformers
-import org.team4u.dbb.util.DataTableUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import org.apache.ddlutils.model.Table
 import org.nutz.castor.Castors
 import org.nutz.lang.Strings
 import org.nutz.lang.segment.CharSegment
 import org.nutz.lang.stream.StringWriter
+import org.team4u.dbb.model.Record
+import org.team4u.dbb.record.transformer.DataTransformers
+import org.team4u.dbb.util.DataTableUtil
 import java.util.*
 
 object RecordDocuments {
@@ -58,7 +58,7 @@ object RecordDocuments {
         val seg = CharSegment(sb.toString().replace("\"", ""));
 
         records.forEach { record ->
-            val value = "|\n" + DataTableUtil.format(record.data.map {
+            val value = "|\n" + record.data.map {
                 val map = LinkedHashMap<String, String?>()
                 it.columnData.forEachIndexed { i, columnData ->
                     val indent = if (i == 0) "    " else ""
@@ -66,7 +66,7 @@ object RecordDocuments {
                 }
 
                 map
-            })
+            }
             seg.set(record.table.name, value)
         }
 
@@ -82,6 +82,7 @@ object RecordDocuments {
                 val column = table.columns.find {
                     it.name == columnName
                 } ?: throw  IllegalArgumentException("Invalid column(name=$columnName)")
+
 
                 val value = it.value.castTo(column.javaType)
                 columnData.add(Record.ColumnData(column, value))

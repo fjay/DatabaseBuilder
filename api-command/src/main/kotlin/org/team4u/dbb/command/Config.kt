@@ -1,6 +1,7 @@
 package org.team4u.dbb.command
 
-import com.asiainfo.common.util.config.Configurable
+import org.team4u.kit.core.config.Configurable
+
 
 /**
  *

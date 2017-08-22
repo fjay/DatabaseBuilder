@@ -1,11 +1,12 @@
 package org.team4u.dbb.record
 
-import org.team4u.dbb.model.Record
-import org.team4u.dbb.model.Table
-import org.team4u.dbb.table.TableManager
+import org.apache.ddlutils.model.Table
 import org.nutz.dao.Chain
 import org.nutz.dao.Dao
 import org.nutz.log.Logs
+import org.team4u.dbb.model.Column
+import org.team4u.dbb.model.Record
+import org.team4u.dbb.table.TableManager
 import java.util.*
 
 class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
@@ -57,7 +58,7 @@ class RecordManager(val dao: Dao, val tables: TableManager.Tables) {
             val columnData = ArrayList<Record.ColumnData>()
 
             table.columns.forEach {
-                columnData.add(Record.ColumnData(it, ele.get(it.name)))
+                columnData.add(Record.ColumnData(Column() it, ele.get(it.name)))
             }
 
             recordData.add(Record.Data(columnData))

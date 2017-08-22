@@ -1,5 +1,6 @@
 package org.team4u.dbb.model
 
+import org.apache.ddlutils.model.Table
 import java.util.*
 
 data class Record(

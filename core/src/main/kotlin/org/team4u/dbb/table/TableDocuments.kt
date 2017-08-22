@@ -1,16 +1,16 @@
 package org.team4u.dbb.table
 
-import org.team4u.dbb.model.Column
-import org.team4u.dbb.model.Index
-import org.team4u.dbb.model.Table
-import org.team4u.dbb.util.DataTableUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.xiaoleilu.hutool.convert.Convert
+import org.apache.ddlutils.model.*
 import org.nutz.dao.entity.annotation.ColType
-import org.nutz.lang.Lang
 import org.nutz.lang.Strings
 import org.nutz.lang.segment.CharSegment
 import org.nutz.lang.stream.StringWriter
+import org.team4u.dbb.model.Column
+import org.team4u.dbb.model.IndexType
+import org.team4u.dbb.util.DataTableUtil
 import java.math.BigDecimal
 import java.util.*
 
@@ -21,18 +21,13 @@ object TableDocuments {
         val mapper = ObjectMapper(YAMLFactory())
         val doc = mapper.readValue(text, TableDocument::class.java)
 
-        for (it in doc.tables) {
-            val name = it.name!!
-            val columns = it.columns!!
-            val indexes = parseIndexes(it.indexes)
-            val pk = indexes.find { it.type == Index.Type.PK }
-
-            val table = Table(
-                    name = name,
-                    columns = parseColumns(columns, pk),
-                    primaryKey = pk,
-                    indexes = indexes.filter { it.type != Index.Type.PK },
-                    comment = it.comment)
+        for (tableDoc in doc.tables) {
+            val table = Table().apply {
+                name = tableDoc.name
+                description = tableDoc.comment
+                addColumns(parseColumns(tableDoc.columns!!))
+                addIndices(parseIndexes(this, tableDoc.indexes))
+            }
             result.add(table)
         }
 
@@ -42,26 +37,35 @@ object TableDocuments {
     fun toDocument(tables: List<Table>): String {
         val doc = TableDocument()
         for (t in tables) {
-            val tableInDoc = TableDocument.Table().apply {
+            val tableDoc = TableDocument.Table().apply {
                 name = t.name
-                comment = t.comment
+                comment = t.description
 
                 columns = "\${$name}"
 
-                val indexes = t.indexes.toMutableList()
-                if (t.primaryKey != null) {
-                    indexes.add(t.primaryKey)
-                }
+                val indexes = t.indices.toMutableList()
+
                 this.indexes = indexes.map { i ->
                     TableDocument.Index().apply {
                         name = i.name
-                        type = i.type.name
-                        columns = i.columns
+                        type = when (i) {
+                            is NonUniqueIndex ->
+                                IndexType.INDEX.name
+
+                            is UniqueIndex ->
+                                IndexType.UNIQUE.name
+
+                            else ->
+                                IndexType.UNKNOWN.name
+                        }
+                        columns = i.columns.map {
+                            it.name
+                        }
                     }
                 }
             }
 
-            doc.tables.add(tableInDoc)
+            doc.tables.add(tableDoc)
         }
 
         return format(doc, tables)
@@ -73,59 +77,60 @@ object TableDocuments {
         val seg = CharSegment(sb.toString().replace("\"", ""));
 
         tables.forEach { table ->
-            seg.set(table.name, "|\n" + DataTableUtil.format(table.columns.map {
-                val length = if (it.precision == null || it.precision <= 0) {
-                    it.width.toString()
-                } else {
-                    it.width.toString() + "," + it.precision
-                }
-
+            seg.set(table.name, "|\n" + table.columns.map {
                 val indent = "    "
                 linkedMapOf(
                         indent + TableDocument.ColumnKey.NAME.name to indent + it.name,
-                        TableDocument.ColumnKey.TYPE.name to it.type.name,
-                        TableDocument.ColumnKey.LENGTH.name to length,
-                        TableDocument.ColumnKey.NULLABLE.name to it.nullable,
-                        TableDocument.ColumnKey.COMMENT.name to it.comment
+                        TableDocument.ColumnKey.TYPE.name to it.type,
+                        TableDocument.ColumnKey.LENGTH.name to it.size,
+                        TableDocument.ColumnKey.NULLABLE.name to !it.isRequired,
+                        TableDocument.ColumnKey.COMMENT.name to it.description
                 )
-            }))
+            })
         }
 
         return seg.toString()
     }
 
-    private fun parseColumns(text: String, pk: Index?): List<Column> {
+    private fun parseColumns(text: String): List<Column> {
         val result = ArrayList<Column>()
         DataTableUtil.each(text) { map ->
             val type = ColType.valueOf(map.getNotNullColumn(TableDocument.ColumnKey.TYPE))
 
-            val name = map.getNotNullColumn(TableDocument.ColumnKey.NAME)
-            val nullable = Lang.parseBoolean(map.getProperty(TableDocument.ColumnKey.NULLABLE) ?: "1")
-            val (width, precision) = getColumnLength(map)
-
-            result.add(Column(
-                    name = name,
-                    width = width,
-                    precision = precision,
-                    type = type,
-                    javaType = asJavaType(type),
-                    pk = pk?.columns?.contains(name) == true,
-                    nullable = nullable,
-                    comment = map.getProperty(TableDocument.ColumnKey.COMMENT)
-            ))
+            result.add(Column(asJavaType(type)).apply {
+                name = map.getNotNullColumn(TableDocument.ColumnKey.NAME)
+                isRequired = !Convert.toBool(map.getProperty(TableDocument.ColumnKey.NULLABLE) ?: "0")
+                isPrimaryKey = Convert.toBool(map.getProperty(TableDocument.ColumnKey.PK) ?: "0")
+                description = map.getProperty(TableDocument.ColumnKey.COMMENT)
+                defaultValue = map.getProperty(TableDocument.ColumnKey.DEFAULT)
+                isAutoIncrement = Convert.toBool(map.getProperty(TableDocument.ColumnKey.AUTO) ?: "0")
+                size = map.getProperty(TableDocument.ColumnKey.LENGTH)
+            })
         }
 
         return result
     }
 
-    private fun parseIndexes(indexes: List<TableDocument.Index>): List<Index> {
+    private fun parseIndexes(table: Table, indexes: List<TableDocument.Index>): List<Index> {
         val result = ArrayList<Index>()
-        indexes.forEach {
-            result.add(Index(
-                    name = it.name,
-                    type = Index.Type.valueOf(it.type!!),
-                    columns = it.columns
-            ))
+        indexes.forEach { i ->
+            val index = when (IndexType.valueOf(i.type!!)) {
+                IndexType.INDEX ->
+                    NonUniqueIndex()
+                IndexType.UNIQUE ->
+                    UniqueIndex()
+                else ->
+                    throw IllegalArgumentException("Invalid index type: ${i.type}")
+            }
+
+            index.apply {
+                name = i.name
+                i.columns.forEach {
+                    addColumn(IndexColumn(table.findColumn(it)))
+                }
+            }
+
+            result.add(index)
         }
 
         return result
@@ -172,15 +177,6 @@ object TableDocuments {
         }
     }
 
-    private fun getColumnLength(map: Map<String, String>): Pair<Int?, Int?> {
-        val lengthString = map.getProperty(TableDocument.ColumnKey.LENGTH) ?: return Pair(null, null)
-
-        val lengthPair = lengthString.split(",")
-        val width = lengthPair[0].toInt()
-        val precision = if (lengthPair.size == 2) lengthPair[1].toInt() else null
-        return Pair(width, precision)
-    }
-
     private fun Map<String, String>.getProperty(key: TableDocument.ColumnKey): String? {
         val value = this[key.name]
 
@@ -212,8 +208,8 @@ object TableDocuments {
         }
 
         enum class ColumnKey {
-            NAME, TYPE, LENGTH, COMMENT,
-            NULLABLE, UNSIGNED, AUTO
+            NAME, TYPE, LENGTH, COMMENT, PK,
+            NULLABLE, UNSIGNED, AUTO, DEFAULT
         }
     }
 }
